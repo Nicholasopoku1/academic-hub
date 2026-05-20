@@ -58,7 +58,7 @@ app.post('/check-academic', async (req, res) => {
     }
 });
 
-// MODULE 2 ENDPOINT: General Assistant with Image/File Support
+// MODULE 2 ENDPOINT: General Assistant with Distinct Image/File Architecture
 app.post('/ask-general', async (req, res) => {
     try {
         const { studentQuestion, studentName, fileData, fileType } = req.body;
@@ -67,21 +67,26 @@ app.post('/ask-general', async (req, res) => {
         let userContent = [
             {
                 type: "text",
-                text: `My name is ${studentName || "Scholar"}. Here is my question: "${studentQuestion || "See attached file information."}"`
+                text: `My name is ${studentName || "Scholar"}. Here is my question: "${studentQuestion || "See attached data layer."}"`
             }
         ];
 
-        // Process images dynamically into the Groq visual message schema
-        if (fileData && fileType && fileType.startsWith('image/')) {
-            userContent.push({
-                type: "image_url",
-                image_url: {
-                    url: fileData // Pass the Base64 Data URI string
-                }
-            });
-        } else if (fileData) {
-            // Append document text attachments directly to context query strings
-            userContent[0].text += `\n\n[Attached Document Context]:\n${fileData}`;
+        if (fileData && fileType) {
+            if (fileType.startsWith('image/')) {
+                // Route image snapshots cleanly into Groq's multimodal image layer
+                userContent.push({
+                    type: "image_url",
+                    image_url: {
+                        url: fileData // Pass Base64 Data URL data stream
+                    }
+                });
+            } else if (fileType === 'application/pdf') {
+                // If it's a PDF base64 Data URL, we note its presence in context
+                userContent[0].text += `\n\n[System Alert: User has uploaded an academic/structural PDF document package via base64 stream].`;
+            } else {
+                // Plain text strings are appended directly as readable prompt context
+                userContent[0].text += `\n\n[Attached File Context]:\n${fileData}`;
+            }
         }
 
         const chatCompletion = await groq.chat.completions.create({
@@ -91,7 +96,7 @@ app.post('/ask-general', async (req, res) => {
                     content: `You are the official AI duplicate of Nicholas Opoku, elite academic advisor, tech specialist at UCC, and author of 'Life Mastery'. 
                     Your mission is to provide authoritative, inspiring, and sharp answers to any general academic, tech career, programming, or student growth questions.
                     
-                    You have advanced multi-modal vision systems active. If an image file (screenshot of a computer bug, student portal breakdown, syllabus, or task) is provided, inspect and analyze the structural visual details intensely to shape your feedback.
+                    You have advanced multimodal vision capabilities active. If an image file (camera snapshot, error screenshot, code breakdown) or a structural document file description is attached, look at the payload details closely to frame your support.
                     
                     Keep your answer punchy, actionable, and cleanly structured using bullet points. End with a sharp, motivational punchline in the style of Nicholas Opoku.`
                 },
@@ -100,7 +105,7 @@ app.post('/ask-general', async (req, res) => {
                     content: userContent
                 }
             ],
-            // Vision capable model used to accurately digest image file contexts
+            // Multimodal engine selected to seamlessly read user media vectors
             model: "llama-3.2-11b-vision-preview"
         });
 
@@ -113,7 +118,7 @@ app.post('/ask-general', async (req, res) => {
     } catch (error) {
         console.error("General AI Error:", error);
         res.status(500).json({
-            response: "The multi-modal vision stream encountered an evaluation block. Verify file sizes are under 4MB."
+            response: "The multimodal vision stream encountered an evaluation block. Verify file sizes are under 4MB."
         });
     }
 });

@@ -120,16 +120,25 @@
                 <p class="text-xs text-slate-400 mb-6">Ask Nicholas AI anything, upload files, or snap pictures of code glitches or charts.</p>
                 
                 <div class="space-y-4">
-                    <div class="relative">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">What May i Assist You With</label>
-                        <textarea id="generalQuestion" rows="4" placeholder="e.g., Look at this screen error snippet. Why is my server failing? Or ask general tech advice..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 pb-12 text-sm text-white focus:outline-none focus:border-amber-400 transition resize-none placeholder:text-slate-700"></textarea>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">What May I Assist You With</label>
+                        <textarea id="generalQuestion" rows="4" placeholder="e.g., Look at this screen error snippet. Why is my server failing? Or ask general tech advice..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition resize-none placeholder:text-slate-700"></textarea>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <label for="pictureAttachment" class="flex-1 min-w-[120px] cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-2.5 rounded-lg text-xs font-semibold text-center transition flex items-center justify-center gap-2 shadow-inner">
+                            <i class="fas fa-camera"></i> <span id="picStatus">Snap Picture</span>
+                        </label>
+                        <input type="file" id="pictureAttachment" accept="image/*" capture="environment" class="hidden" onchange="processMediaFile('pictureAttachment')">
+
+                        <label for="docAttachment" class="flex-1 min-w-[120px] cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-2.5 rounded-lg text-xs font-semibold text-center transition flex items-center justify-center gap-2 shadow-inner">
+                            <i class="fas fa-file-alt"></i> <span id="docStatus">Upload File</span>
+                        </label>
+                        <input type="file" id="docAttachment" accept="application/pdf,text/plain" class="hidden" onchange="processMediaFile('docAttachment')">
                         
-                        <div class="absolute bottom-3 left-3 flex items-center gap-2">
-                            <label for="fileAttachment" class="cursor-pointer bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-1.5 rounded-md text-xs transition flex items-center gap-1.5">
-                                <i class="fas fa-paperclip"></i> <span id="uploadStatus">Attach File/Picture</span>
-                            </label>
-                            <input type="file" id="fileAttachment" accept="image/*,application/pdf,text/plain" capture="environment" class="hidden" onchange="handleFileProcessing()">
-                        </div>
+                        <button id="clearFileBtn" onclick="clearSelectedFile()" class="hidden bg-red-950/40 hover:bg-red-900/60 border border-red-900/60 text-red-400 px-3 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
+                            <i class="fas fa-trash-alt"></i> Clear
+                        </button>
                     </div>
 
                     <button onclick="askGeneralQuestion()" id="generalBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold p-3 rounded-lg text-sm tracking-wide transition flex items-center justify-center gap-2 shadow-lg">
@@ -166,9 +175,11 @@
         let attachedFileData = null;
         let attachedFileType = null;
 
-        function handleFileProcessing() {
-            const fileInput = document.getElementById('fileAttachment');
-            const statusText = document.getElementById('uploadStatus');
+        function processMediaFile(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const picStatus = document.getElementById('picStatus');
+            const docStatus = document.getElementById('docStatus');
+            const clearBtn = document.getElementById('clearFileBtn');
             const file = fileInput.files[0];
 
             if (!file) return;
@@ -176,24 +187,55 @@
             // Constrain files to 4MB for high-speed network delivery
             if (file.size > 4 * 1024 * 1024) {
                 alert("File architecture threshold exceeded. Max size limit is 4MB.");
-                fileInput.value = "";
+                clearSelectedFile();
                 return;
             }
+
+            // Always clear previous choices so only one file transits at a time
+            clearSelectedFile(false); 
 
             attachedFileType = file.type;
             const reader = new FileReader();
 
             reader.onloadend = function () {
-                attachedFileData = reader.result; // Data string format pipeline
-                statusText.innerText = `Selected: ${file.name.substring(0, 10)}...`;
-                statusText.classList.remove('text-slate-400');
-                statusText.classList.add('text-amber-400');
+                attachedFileData = reader.result; 
+                const shortName = `File: ${file.name.substring(0, 8)}...`;
+                
+                if (inputId === 'pictureAttachment') {
+                    picStatus.innerText = shortName;
+                    picStatus.parentElement.classList.add('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
+                } else {
+                    docStatus.innerText = shortName;
+                    docStatus.parentElement.classList.add('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
+                }
+                clearBtn.classList.remove('hidden');
             }
 
             if (file.type.startsWith('image/')) {
-                reader.readAsDataURL(file); // Encode directly to Base64 image URL layout
+                reader.readAsDataURL(file); // Encode image as Base64 Data URI string
             } else {
-                reader.readAsText(file); // Standardize documentation variables into string context
+                reader.readAsText(file); // Parse plain text or code strings as simple context strings
+            }
+        }
+
+        // Clean Reset Utility for all selection lanes
+        function clearSelectedFile(hideTrashButton = true) {
+            attachedFileData = null;
+            attachedFileType = null;
+            document.getElementById('pictureAttachment').value = "";
+            document.getElementById('docAttachment').value = "";
+            
+            const picStatus = document.getElementById('picStatus');
+            const docStatus = document.getElementById('docStatus');
+            
+            picStatus.innerText = "Snap Picture";
+            picStatus.parentElement.classList.remove('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
+            
+            docStatus.innerText = "Upload File";
+            docStatus.parentElement.classList.remove('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
+            
+            if (hideTrashButton) {
+                document.getElementById('clearFileBtn').classList.add('hidden');
             }
         }
 
@@ -280,17 +322,13 @@
                 result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
                 // Reset inputs and system parameters after payload resolution
-                attachedFileData = null;
-                attachedFileType = null;
-                document.getElementById('fileAttachment').value = "";
-                document.getElementById('uploadStatus').innerText = "Attach / Snap";
-                document.getElementById('uploadStatus').classList.remove('text-amber-400');
-                document.getElementById('uploadStatus').classList.add('text-slate-400');
+                document.getElementById('generalQuestion').value = "";
+                clearSelectedFile();
 
             } catch (err) {
                 alert("Communication crash with general knowledge engine.");
             } finally {
-                btn.innerHTML = `<i class="fas fa-paper-plane"></i> Dispatch Question`;
+                btn.innerHTML = `<i class="fas fa-paper-plane"></i> Send`;
                 btn.disabled = false;
             }
         }
