@@ -152,8 +152,8 @@ app.post('/ask-general', async (req, res) => {
                     content: userContent
                 }
             ],
-            // Multimodal engine selected to seamlessly read user media vectors
-            model: "llama-3.2-11b-vision-preview"
+            // CRITICAL INFRASTRUCTURE FIX: Upgraded to the heavy-duty, highly stable 90B vision engine
+            model: "llama-3.2-90b-vision-preview"
         });
 
         const aiResponse = chatCompletion.choices[0].message.content;
@@ -164,8 +164,9 @@ app.post('/ask-general', async (req, res) => {
 
     } catch (error) {
         console.error("General AI Error:", error);
+        // FIX: Returns the exact message from the catch handler directly to the client UI to make troubleshooting simple
         res.status(500).json({
-            response: "The multimodal vision stream encountered an evaluation block. Verify file sizes are under 4MB."
+            response: `AI Processing Matrix Blocked: ${error.message || "Verify file metrics and API configuration keys."}`
         });
     }
 });
