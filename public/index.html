@@ -23,9 +23,25 @@
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Email Parameters</label>
                     <input type="email" id="authEmail" placeholder="yourname@domain.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
                 </div>
+                
+                <div id="authProgramWrapper" class="hidden">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Academic Program / Major</label>
+                    <input type="text" id="authProgram" placeholder="e.g., Computer Science, BCom" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
+                </div>
+                
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Security Hash (Password)</label>
                     <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
+                </div>
+
+                <div id="confirmPasswordWrapper" class="hidden">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Confirm Security Hash</label>
+                    <input type="password" id="authConfirmPassword" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="showPasswordToggle" class="w-4 h-4 rounded accent-amber-500 bg-slate-950 border-slate-800 cursor-pointer">
+                    <label for="showPasswordToggle" class="text-xs text-slate-400 selection:bg-transparent select-none cursor-pointer hover:text-slate-300 transition">Show Passwords</label>
                 </div>
 
                 <button onclick="handleAuthAction()" id="authSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-3 rounded-lg text-sm tracking-wide transition mt-2 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10">
@@ -86,16 +102,38 @@
                 </div>
             </div>
         </div>
-        <div class="md:col-span-5 hidden md:flex justify-center">
-            <div class="relative w-72 h-96 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-3xl p-6 flex flex-col justify-between shadow-2xl shadow-amber-500/5 overflow-hidden group">
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition duration-500"></div>
-                <div class="text-xs font-bold uppercase tracking-widest text-amber-400/60">Core Framework</div>
-                <div class="space-y-4 my-auto">
-                    <p class="text-xs text-slate-400"><strong class="text-white">01.</strong> Mindset Alignment</p>
-                    <p class="text-xs text-slate-400"><strong class="text-white">02.</strong> Skill Acquisition</p>
-                    <p class="text-xs text-slate-400"><strong class="text-white">03.</strong> Intentional Execution</p>
+        
+        <div class="md:col-span-5 flex justify-center w-full">
+            <div class="relative w-full max-w-sm bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between shadow-2xl overflow-hidden group">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl"></div>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800/80 pb-3">
+                        <span class="text-xs font-black uppercase tracking-widest text-amber-400"><i class="fas fa-id-card mr-1.5"></i>Scholar Card</span>
+                        <span class="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">Connected</span>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <p class="text-xs text-slate-400">
+                            <strong class="text-white font-medium block text-[10px] uppercase text-slate-500 tracking-wider mb-0.5">Active ID Coordinates</strong> 
+                            <span id="cardUserEmail" class="font-mono text-slate-300">Loading token...</span>
+                        </p>
+                        
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Your Configured Program</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="profileProgramInput" value="Loading settings..." class="bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-lg p-2.5 text-xs text-white focus:outline-none w-full transition">
+                                <button onclick="updateUserProgramProfile()" title="Save Program Vector" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-2.5 rounded-lg text-xs transition">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-xs text-slate-500 border-t border-slate-800/80 pt-4 font-mono">© 2026 Nicholas Opoku</div>
+                <div class="text-[10px] text-slate-500 border-t border-slate-800/80 pt-4 mt-6 font-mono flex justify-between items-center">
+                    <span>Life Mastery Framework</span>
+                    <span>© 2026</span>
+                </div>
             </div>
         </div>
     </header>
@@ -103,6 +141,21 @@
     <hr class="border-slate-900 max-w-6xl mx-auto my-2 px-4">
 
     <main id="hub" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-16">
+        
+        <div id="materials-vault" class="bg-slate-900/40 border border-slate-800/80 p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <h3 class="text-xl font-black bg-gradient-to-r from-white via-slate-200 to-amber-400 bg-clip-text text-transparent"><i class="fas fa-folder-open text-amber-500 mr-2"></i>Open-Source Material Vault</h3>
+                    <p class="text-xs text-slate-400">Displaying free lecture material coordinates synchronized to your program framework.</p>
+                </div>
+                <div class="relative w-full md:w-72">
+                    <i class="fas fa-search absolute left-3 top-3.5 text-slate-500 text-xs"></i>
+                    <input type="text" id="vaultSearch" onkeyup="filterVaultMaterials()" placeholder="Search course code, program or title..." class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-700">
+                </div>
+            </div>
+
+            <div id="vaultGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
         
         <div class="space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
@@ -230,8 +283,17 @@
         let attachedFileData = null;
         let attachedFileType = null;
         let currentUserEmail = null; 
+        let userConfiguredProgram = "General";
 
-        // LOCAL AUTH ACTIONS LAYER
+        // MASTER ACADEMIC CATALOG ARCHITECTURE ARRAY
+        const universityCatalog = [
+            { program: "Computer Science", courseCode: "CMS 201", title: "Data Structures & Algorithms", type: "Slides & Source Code", downloadUrl: "#" },
+            { program: "Computer Science", courseCode: "CMS 203", title: "Web Development Frameworks", type: "Handouts & Projects", downloadUrl: "#" },
+            { program: "Computer Science", courseCode: "INF 205", title: "Database Systems Architecture", type: "Lab Schemas", downloadUrl: "#" },
+            { program: "Business Administration", courseCode: "BUS 101", title: "Principles of Management", type: "Core Course Slides", downloadUrl: "#" },
+            { program: "Mathematics", courseCode: "MAT 102", title: "Calculus with Analytic Geometry", type: "Past Questions", downloadUrl: "#" }
+        ];
+
         function toggleAuthMode() {
             isSignUpMode = !isSignUpMode;
             const title = document.getElementById('authTitle');
@@ -239,6 +301,12 @@
             const btn = document.getElementById('authSubmitBtn');
             const switchText = document.getElementById('authSwitchText');
             const switchBtn = document.getElementById('authSwitchBtn');
+            const confirmWrapper = document.getElementById('confirmPasswordWrapper');
+            const programWrapper = document.getElementById('authProgramWrapper');
+
+            document.getElementById('showPasswordToggle').checked = false;
+            document.getElementById('authPassword').type = 'password';
+            document.getElementById('authConfirmPassword').type = 'password';
 
             if (isSignUpMode) {
                 title.innerText = "Initialize Success Profile";
@@ -246,23 +314,51 @@
                 btn.innerHTML = `<i class="fas fa-user-plus"></i> Register Profile Coordinates`;
                 switchText.innerText = "Already registered within the hub?";
                 switchBtn.innerText = "Sign In";
+                confirmWrapper.classList.remove('hidden');
+                programWrapper.classList.remove('hidden'); // SHOW Program choice field on Sign Up
             } else {
                 title.innerText = "Access Life Mastery Engine";
                 subtitle.innerText = "Log in to process blueprints and unlock the general knowledge base.";
                 btn.innerHTML = `<i class="fas fa-sign-in-alt"></i> Authenticate Operational Access`;
                 switchText.innerText = "New scholar to the ecosystem?";
                 switchBtn.innerText = "Create Account";
+                confirmWrapper.classList.add('hidden');
+                programWrapper.classList.add('hidden'); // HIDE Program choice field on Sign In
             }
         }
+
+        document.getElementById('showPasswordToggle').addEventListener('change', function() {
+            const passwordInput = document.getElementById('authPassword');
+            const confirmPasswordInput = document.getElementById('authConfirmPassword');
+            const visualState = this.checked ? 'text' : 'password';
+            
+            passwordInput.type = visualState;
+            confirmPasswordInput.type = visualState;
+        });
 
         async function handleAuthAction() {
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
+            const confirmPassword = document.getElementById('authConfirmPassword').value;
+            const program = document.getElementById('authProgram').value;
             const btn = document.getElementById('authSubmitBtn');
 
             if (!email || !password) {
                 alert("Provide complete registration fields.");
                 return;
+            }
+
+            if (isSignUpMode) {
+                if (password !== confirmPassword) {
+                    alert("Security Matrix Rejection: Input passwords do not match each other.");
+                    return;
+                }
+
+                const strictPasswordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,18}$/;
+                if (!strictPasswordRegex.test(password)) {
+                    alert("Security Standard Unmet: Password must be 6 to 18 characters long and include at least one number and one symbol.");
+                    return;
+                }
             }
 
             btn.disabled = true;
@@ -274,7 +370,7 @@
                 const res = await fetch(targetUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password, program })
                 });
 
                 const data = await res.json();
@@ -283,9 +379,11 @@
                 if (isSignUpMode) {
                     alert("Profile configured successfully! Switching to sign-in lane.");
                     toggleAuthMode();
+                    document.getElementById('authPassword').value = "";
+                    document.getElementById('authConfirmPassword').value = "";
                 } else {
                     localStorage.setItem('userSessionToken', data.email);
-                    checkUserSessionState();
+                    await checkUserSessionState();
                 }
             } catch (error) {
                 alert(error.message);
@@ -295,6 +393,116 @@
             }
         }
 
+        async function checkUserSessionState() {
+            const token = localStorage.getItem('userSessionToken');
+            const overlay = document.getElementById('authOverlay');
+            if (token) {
+                currentUserEmail = token;
+                document.getElementById('cardUserEmail').innerText = token;
+                overlay.classList.add('hidden');
+                
+                // Fetch current configuration vectors from Firestore database architecture
+                await fetchAndUpdateUserDashboardConfiguration();
+                renderUserSavedHistories(); 
+            } else {
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        async function fetchAndUpdateUserDashboardConfiguration() {
+            try {
+                const res = await fetch('/api/get-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentUserEmail })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    userConfiguredProgram = data.program || "General";
+                    document.getElementById('profileProgramInput').value = userConfiguredProgram;
+                    renderMaterialVault(); // Populates localized grid outputs matching configuration variables
+                }
+            } catch (err) {
+                console.error("Failed to fetch user database profile details.");
+            }
+        }
+
+        async function updateUserProgramProfile() {
+            const programValue = document.getElementById('profileProgramInput').value;
+            if (!programValue.trim()) {
+                alert("Program field cannot be evaluated as blank.");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/update-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentUserEmail, program: programValue })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert(data.message);
+                    userConfiguredProgram = programValue;
+                    renderMaterialVault();
+                } else {
+                    alert(data.error);
+                }
+            } catch (err) {
+                alert("Profile update transmission error.");
+            }
+        }
+
+        // INTELLIGENT MATERIAL CATALOG FILTERING AND RENDERING ENGINE
+        function renderMaterialVault(items = universityCatalog) {
+            const grid = document.getElementById('vaultGrid');
+            if (!grid) return;
+
+            const userProgramLower = userConfiguredProgram.toLowerCase().trim();
+            
+            // Re-order sorting hierarchy layout parameters so matching program items float to absolute top precedence
+            const sortedItems = [...items].sort((a, b) => {
+                const aMatch = a.program.toLowerCase().includes(userProgramLower);
+                const bMatch = b.program.toLowerCase().includes(userProgramLower);
+                return bMatch - aMatch;
+            });
+
+            if (sortedItems.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-slate-600 text-xs py-8 italic">No academic catalog elements match filter.</div>`;
+                return;
+            }
+
+            grid.innerHTML = sortedItems.map(item => {
+                const isPersonalizedMatch = item.program.toLowerCase().includes(userProgramLower);
+                return `
+                    <div class="bg-slate-950 border ${isPersonalizedMatch ? 'border-amber-500/30 shadow-lg shadow-amber-500/5' : 'border-slate-800/80'} hover:border-amber-500/60 p-4 rounded-xl flex flex-col justify-between gap-4 transition group relative overflow-hidden">
+                        ${isPersonalizedMatch ? '<div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded font-bold"><i class="fas fa-star mr-1"></i>Your Program</div>' : ''}
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-mono tracking-wider text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded uppercase font-semibold">${item.courseCode}</span>
+                                <span class="text-[10px] text-slate-500 font-medium"><i class="fas fa-file-pdf mr-1 text-red-500/70"></i>${item.type}</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-200 group-hover:text-amber-400 transition line-clamp-1">${item.title}</h4>
+                            <p class="text-[10px] text-slate-500 font-medium">${item.program}</p>
+                        </div>
+                        <a href="${item.downloadUrl}" target="_blank" class="w-full bg-slate-900 hover:bg-amber-500 border border-slate-800 group-hover:border-transparent text-slate-300 group-hover:text-slate-950 font-bold text-center py-2 rounded-lg text-[11px] transition flex items-center justify-center gap-1.5 shadow-md">
+                            <i class="fas fa-cloud-download-alt text-xs"></i> Access Resource
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterVaultMaterials() {
+            const query = document.getElementById('vaultSearch').value.toLowerCase().trim();
+            const filtered = universityCatalog.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                item.courseCode.toLowerCase().includes(query) ||
+                item.program.toLowerCase().includes(query)
+            );
+            renderMaterialVault(filtered);
+        }
+
         function logoutUserProfile() {
             localStorage.removeItem('userSessionToken');
             currentUserEmail = null;
@@ -302,19 +510,6 @@
             alert("Session coordinates dropped safely.");
         }
 
-        function checkUserSessionState() {
-            const token = localStorage.getItem('userSessionToken');
-            const overlay = document.getElementById('authOverlay');
-            if (token) {
-                currentUserEmail = token;
-                overlay.classList.add('hidden');
-                renderUserSavedHistories(); 
-            } else {
-                overlay.classList.remove('hidden');
-            }
-        }
-
-        // BROWSER LOCAL STORAGE HISTORY MAPS
         function fetchUserHistoryKey(type) {
             return `history_${currentUserEmail}_${type}`;
         }
@@ -373,7 +568,6 @@
             }
         }
 
-        // BINARY STREAM MULTIMEDIA COMPILING HANDLER
         function processMediaFile(inputId, statusId) {
             const fileInput = document.getElementById(inputId);
             const statusText = document.getElementById(statusId);
@@ -388,7 +582,6 @@
                 return;
             }
 
-            // Flips previous choices clean so only one visual dataset goes to server context
             clearSelectedFile(false); 
 
             attachedFileType = file.type;
@@ -412,7 +605,6 @@
             attachedFileData = null;
             attachedFileType = null;
             
-            // Wipe all DOM nodes
             const upPic = document.getElementById('uploadPicAttachment');
             const takePic = document.getElementById('takePicAttachment');
             const docFile = document.getElementById('docAttachment');
@@ -425,7 +617,6 @@
             const takeStatus = document.getElementById('takePicStatus');
             const docStatus = document.getElementById('docStatus');
             
-            // Clean styles and clear trailing whitespace lines smoothly
             if (upStatus) {
                 upStatus.innerText = "Upload Photo";
                 upStatus.parentElement.className = upStatus.parentElement.className.replace(/text-amber-400|border-amber-500|bg-amber-500\/5/g, '').replace(/\s+/g, ' ').trim();
@@ -445,7 +636,6 @@
             }
         }
 
-        // TRANSACTION ENGINE FOR OPERATIONAL BLUEPRINTS
         async function checkAcademicStatus() {
             const name = document.getElementById('studentName').value;
             const gpa = document.getElementById('currentGpa').value;
@@ -494,11 +684,8 @@
             }
         }
 
-        // SEAMLESS MULTIMODAL GENERAL QUESTION DISPATCH ENGINE WITH SECURITY FALLBACKS
         async function askGeneralQuestion() {
             const question = document.getElementById('generalQuestion').value;
-            
-            // Safe identity resolution grabs typed profile values or drops active user session handles
             const studentInputName = document.getElementById('studentName') ? document.getElementById('studentName').value : '';
             const fallbackName = studentInputName || currentUserEmail || "Scholar";
 
