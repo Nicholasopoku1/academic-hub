@@ -55,12 +55,24 @@ app.get('/', (req, res) => {
 // PERSISTENT PERMANENT AUTHENTICATION ROUTES
 // ==========================================
 
-// PERMANENT ROUTE 1: Sign Up Coordination Matrix
+// PERMANENT ROUTE 1: Sign Up Coordination Matrix (With Strict Security Checks)
 app.post('/api/signup', async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: "Missing identity validation metrics." });
+        }
+
+        // STRICT PASSWORD VALIDATION RULE:
+        // - Must be between 6 and 18 characters long
+        // - Must contain at least one number
+        // - Must contain at least one special symbol (e.g., !, @, #, $, %, etc.)
+        const strictPasswordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,18}$/;
+        
+        if (!strictPasswordRegex.test(password)) {
+            return res.status(400).json({ 
+                error: "Security Standard Unmet: Password must be 6 to 18 characters long and include at least one number and one symbol." 
+            });
         }
 
         const normalizedEmail = email.toLowerCase().trim();
