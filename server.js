@@ -152,8 +152,8 @@ app.post('/ask-general', async (req, res) => {
                     content: userContent
                 }
             ],
-            // CRITICAL INFRASTRUCTURE FIX: Upgraded to the heavy-duty, highly stable 90B vision engine
-            model: "llama-3.2-90b-vision-preview"
+            // STABLE PRODUCTION MODEL FIX: Using the active vision-instruct architecture
+            model: "llama-3.2-90b-vision-instruct"
         });
 
         const aiResponse = chatCompletion.choices[0].message.content;
@@ -164,7 +164,6 @@ app.post('/ask-general', async (req, res) => {
 
     } catch (error) {
         console.error("General AI Error:", error);
-        // FIX: Returns the exact message from the catch handler directly to the client UI to make troubleshooting simple
         res.status(500).json({
             response: `AI Processing Matrix Blocked: ${error.message || "Verify file metrics and API configuration keys."}`
         });
@@ -172,5 +171,5 @@ app.post('/ask-general', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running live on port ${PORT}`);
+    console.log("Server is running live on port " + PORT);
 });
