@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,8 +10,6 @@ const PORT = process.env.PORT || 3000;
 // FIREBASE ADMIN STORAGE INITIALIZATION
 // ==========================================
 const admin = require('firebase-admin');
-const fs = require('fs');
-const path = require('path');
 
 try {
     // Looks for the file locally or dynamically fetched via Render Secret Files mount points
@@ -30,6 +30,25 @@ try {
 
 const db = admin.firestore();
 const usersCollection = db.collection('users');
+
+// ==========================================
+// MIDDLEWARE CONFIGURATION MATRIX
+// ==========================================
+// Expanded JSON limit handles larger base64 file payloads smoothly
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.static('public'));
+
+// FIX: Explicitly serve the dashboard landing index file for root path traffic
+app.get('/', (req, res) => {
+    // If your index file is in the root directory, use this:
+    res.sendFile(path.join(__dirname, 'index.html'), (err) => {
+        if (err) {
+            // Fallback lookup path if your index file is sitting inside the public asset folder
+            res.sendFile(path.join(__dirname, 'public', 'index.html'));
+        }
+    });
+});
 
 
 // ==========================================
