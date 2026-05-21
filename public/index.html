@@ -151,8 +151,7 @@
             
             <div class="bg-slate-900/20 border border-slate-900 rounded-2xl p-4 sm:p-6">
                 <h4 class="text-xs font-bold tracking-widest text-amber-400 uppercase mb-4"><i class="fas fa-history mr-2"></i>Your Blueprint Archive</h4>
-                <div id="blueprintHistoryContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2">
-                    </div>
+                <div id="blueprintHistoryContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2"></div>
             </div>
         </div>
 
@@ -160,7 +159,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
                 <div class="lg:col-span-5 bg-slate-900/40 border border-slate-800/60 p-5 sm:p-8 rounded-2xl shadow-xl h-fit">
                     <h3 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-1">General Knowledge Base</h3>
-                    <p class="text-xs text-slate-400 mb-6">Ask Nicholas AI anything, upload files, or snap pictures of code glitches or charts.</p>
+                    <p class="text-xs text-slate-400 mb-6">Ask Nicholas AI anything, select or capture pictures, or upload code scripts.</p>
                     
                     <div class="space-y-4">
                         <div>
@@ -168,19 +167,26 @@
                             <textarea id="generalQuestion" rows="4" placeholder="e.g., Look at this screen error snippet. Why is my server failing? Or ask general tech advice..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition resize-none placeholder:text-slate-700"></textarea>
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-2">
-                            <label for="pictureAttachment" class="flex-1 min-w-[120px] cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-2.5 rounded-lg text-xs font-semibold text-center transition flex items-center justify-center gap-2 shadow-inner">
-                                <i class="fas fa-camera"></i> <span id="picStatus">Snap Picture</span>
-                            </label>
-                            <input type="file" id="pictureAttachment" accept="image/*" capture="environment" class="hidden" onchange="processMediaFile('pictureAttachment')">
+                        <div class="flex flex-col gap-2">
+                            <div class="grid grid-cols-3 gap-2">
+                                <label for="uploadPicAttachment" class="cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 p-2.5 rounded-lg text-[11px] font-semibold text-center transition flex flex-col items-center justify-center gap-1.5 shadow-inner">
+                                    <i class="fas fa-image text-sm"></i> <span id="uploadPicStatus" class="line-clamp-1">Upload Photo</span>
+                                </label>
+                                <input type="file" id="uploadPicAttachment" accept="image/*" class="hidden" onchange="processMediaFile('uploadPicAttachment', 'uploadPicStatus')">
 
-                            <label for="docAttachment" class="flex-1 min-w-[120px] cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-2.5 rounded-lg text-xs font-semibold text-center transition flex items-center justify-center gap-2 shadow-inner">
-                                <i class="fas fa-file-alt"></i> <span id="docStatus">Upload File</span>
-                            </label>
-                            <input type="file" id="docAttachment" accept="application/pdf,text/plain" class="hidden" onchange="processMediaFile('docAttachment')">
-                            
-                            <button id="clearFileBtn" onclick="clearSelectedFile()" class="hidden bg-red-950/40 hover:bg-red-900/60 border border-red-900/60 text-red-400 px-3 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
-                                <i class="fas fa-trash-alt"></i> Clear
+                                <label for="takePicAttachment" class="cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 p-2.5 rounded-lg text-[11px] font-semibold text-center transition flex flex-col items-center justify-center gap-1.5 shadow-inner">
+                                    <i class="fas fa-camera text-sm"></i> <span id="takePicStatus" class="line-clamp-1">Take Photo</span>
+                                </label>
+                                <input type="file" id="takePicAttachment" accept="image/*" capture="environment" class="hidden" onchange="processMediaFile('takePicAttachment', 'takePicStatus')">
+
+                                <label for="docAttachment" class="cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 p-2.5 rounded-lg text-[11px] font-semibold text-center transition flex flex-col items-center justify-center gap-1.5 shadow-inner">
+                                    <i class="fas fa-file-alt text-sm"></i> <span id="docStatus" class="line-clamp-1">Upload File</span>
+                                </label>
+                                <input type="file" id="docAttachment" accept="application/pdf,text/plain" class="hidden" onchange="processMediaFile('docAttachment', 'docStatus')">
+                            </div>
+
+                            <button id="clearFileBtn" onclick="clearSelectedFile()" class="hidden w-full bg-red-950/40 hover:bg-red-900/60 border border-red-900/60 text-red-400 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
+                                <i class="fas fa-trash-alt"></i> Clear Selected Attachment
                             </button>
                         </div>
 
@@ -209,8 +215,7 @@
 
             <div class="bg-slate-900/20 border border-slate-900 rounded-2xl p-4 sm:p-6">
                 <h4 class="text-xs font-bold tracking-widest text-orange-400 uppercase mb-4"><i class="fas fa-comments-dollar mr-2"></i>Your Knowledge Base Thread Logs</h4>
-                <div id="generalChatHistoryContainer" class="space-y-4 max-h-[350px] overflow-y-auto pr-2">
-                    </div>
+                <div id="generalChatHistoryContainer" class="space-y-4 max-h-[350px] overflow-y-auto pr-2"></div>
             </div>
         </div>
 
@@ -224,7 +229,7 @@
         let isSignUpMode = false;
         let attachedFileData = null;
         let attachedFileType = null;
-        let currentUserEmail = null; // Holds active scope pointer
+        let currentUserEmail = null; 
 
         // LOCAL AUTH ACTIONS LAYER
         function toggleAuthMode() {
@@ -303,13 +308,13 @@
             if (token) {
                 currentUserEmail = token;
                 overlay.classList.add('hidden');
-                renderUserSavedHistories(); // Populate history logs on valid entrance
+                renderUserSavedHistories(); 
             } else {
                 overlay.classList.remove('hidden');
             }
         }
 
-        // HISTORY MANAGEMENT ENGINE (USER SPACE ENCRYPTED)
+        // BROWSER LOCAL STORAGE HISTORY MAPS
         function fetchUserHistoryKey(type) {
             return `history_${currentUserEmail}_${type}`;
         }
@@ -317,7 +322,7 @@
         function saveHistoryItem(type, item) {
             const storageKey = fetchUserHistoryKey(type);
             let activeHistory = JSON.parse(localStorage.getItem(storageKey)) || [];
-            activeHistory.unshift(item); // Prepend so latest shows at the top
+            activeHistory.unshift(item); 
             localStorage.setItem(storageKey, JSON.stringify(activeHistory));
             renderUserSavedHistories();
         }
@@ -325,7 +330,6 @@
         function renderUserSavedHistories() {
             if (!currentUserEmail) return;
 
-            // Render Blueprints Archive
             const blueprintContainer = document.getElementById('blueprintHistoryContainer');
             const blueprintKey = fetchUserHistoryKey('blueprints');
             const blueprints = JSON.parse(localStorage.getItem(blueprintKey)) || [];
@@ -346,7 +350,6 @@
                 `).join('');
             }
 
-            // Render General Conversations Thread Logs
             const chatContainer = document.getElementById('generalChatHistoryContainer');
             const chatKey = fetchUserHistoryKey('chats');
             const chats = JSON.parse(localStorage.getItem(chatKey)) || [];
@@ -370,37 +373,31 @@
             }
         }
 
-        // BINARY MULTIMEDIA FILE PARSING LOGIC
-        function processMediaFile(inputId) {
+        // BINARY STREAM MULTIMEDIA COMPILING HANDLER
+        function processMediaFile(inputId, statusId) {
             const fileInput = document.getElementById(inputId);
-            const picStatus = document.getElementById('picStatus');
-            const docStatus = document.getElementById('docStatus');
+            const statusText = document.getElementById(statusId);
             const clearBtn = document.getElementById('clearFileBtn');
             const file = fileInput.files[0];
 
             if (!file) return;
 
             if (file.size > 4 * 1024 * 1024) {
-                alert("Max size limit is 4MB.");
+                alert("File architecture threshold exceeded. Max size limit is 4MB.");
                 clearSelectedFile();
                 return;
             }
 
+            // Flips previous choices clean so only one visual dataset goes to server context
             clearSelectedFile(false); 
+
             attachedFileType = file.type;
             const reader = new FileReader();
 
             reader.onloadend = function () {
                 attachedFileData = reader.result; 
-                const shortName = `Attached: ${file.name.substring(0, 8)}...`;
-                
-                if (inputId === 'pictureAttachment') {
-                    picStatus.innerText = shortName;
-                    picStatus.parentElement.classList.add('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
-                } else {
-                    docStatus.innerText = shortName;
-                    docStatus.parentElement.classList.add('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
-                }
+                statusText.innerText = `Selected: ${file.name.substring(0, 5)}...`;
+                statusText.parentElement.classList.add('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
                 clearBtn.classList.remove('hidden');
             }
 
@@ -415,38 +412,47 @@
             attachedFileData = null;
             attachedFileType = null;
             
-            const picInput = document.getElementById('pictureAttachment');
-            const docInput = document.getElementById('docAttachment');
-            if (picInput) picInput.value = "";
-            if (docInput) docInput.value = "";
+            // Wipe all DOM nodes
+            const upPic = document.getElementById('uploadPicAttachment');
+            const takePic = document.getElementById('takePicAttachment');
+            const docFile = document.getElementById('docAttachment');
             
-            const picStatus = document.getElementById('picStatus');
+            if (upPic) upPic.value = "";
+            if (takePic) takePic.value = "";
+            if (docFile) docFile.value = "";
+            
+            const upStatus = document.getElementById('uploadPicStatus');
+            const takeStatus = document.getElementById('takePicStatus');
             const docStatus = document.getElementById('docStatus');
             
-            if (picStatus) {
-                picStatus.innerText = "Snap Picture";
-                picStatus.parentElement.className = picStatus.parentElement.className
-                    .replace(/text-amber-400|border-amber-500|bg-amber-500\/5/g, '').replace(/\s+/g, ' ').trim();
+            // Clean styles and clear trailing whitespace lines smoothly
+            if (upStatus) {
+                upStatus.innerText = "Upload Photo";
+                upStatus.parentElement.className = upStatus.parentElement.className.replace(/text-amber-400|border-amber-500|bg-amber-500\/5/g, '').replace(/\s+/g, ' ').trim();
+            }
+            if (takeStatus) {
+                takeStatus.innerText = "Take Photo";
+                takeStatus.parentElement.className = takeStatus.parentElement.className.replace(/text-amber-400|border-amber-500|bg-amber-500\/5/g, '').replace(/\s+/g, ' ').trim();
             }
             if (docStatus) {
                 docStatus.innerText = "Upload File";
-                docStatus.parentElement.className = docStatus.parentElement.className
-                    .replace(/text-amber-400|border-amber-500|bg-amber-500\/5/g, '').replace(/\s+/g, ' ').trim();
+                docStatus.parentElement.className = docStatus.parentElement.className.replace(/text-amber-400|border-amber-500|bg-amber-500\/5/g, '').replace(/\s+/g, ' ').trim();
             }
+            
             if (hideTrashButton) {
                 const clearBtn = document.getElementById('clearFileBtn');
                 if (clearBtn) clearBtn.classList.add('hidden');
             }
         }
 
-        // TRANSACTION PAYLOAD ROUTING
+        // TRANSACTION ENGINE FOR OPERATIONAL BLUEPRINTS
         async function checkAcademicStatus() {
             const name = document.getElementById('studentName').value;
             const gpa = document.getElementById('currentGpa').value;
             const challenge = document.getElementById('studentChallenge').value;
 
             if (!name || !gpa || !challenge) {
-                alert("Please fill out all validation fields.");
+                alert("Please fill out all operational validation parameters before engine deployment.");
                 return;
             }
 
@@ -473,7 +479,6 @@
                 result.classList.remove('hidden');
                 result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-                // Archive the generated result to localStorage history maps
                 saveHistoryItem('blueprints', {
                     title: data.message,
                     advice: data.advice,
@@ -482,19 +487,23 @@
                 });
 
             } catch (err) {
-                alert("Communication crash with cloud engine.");
+                alert("Communication crash with cloud engine. Verify backend logs.");
             } finally {
                 btn.innerHTML = `<i class="fas fa-brain"></i> Generate Success Blueprint`;
                 btn.disabled = false;
             }
         }
 
+        // SEAMLESS MULTIMODAL GENERAL QUESTION DISPATCH ENGINE WITH SECURITY FALLBACKS
         async function askGeneralQuestion() {
             const question = document.getElementById('generalQuestion').value;
-            const fallbackName = document.getElementById('studentName').value || "Scholar";
+            
+            // Safe identity resolution grabs typed profile values or drops active user session handles
+            const studentInputName = document.getElementById('studentName') ? document.getElementById('studentName').value : '';
+            const fallbackName = studentInputName || currentUserEmail || "Scholar";
 
             if (!question && !attachedFileData) {
-                alert("Please type a question or select a target media file.");
+                alert("Please provide either a structural text query or a valid file parameter.");
                 return;
             }
 
@@ -502,24 +511,31 @@
             const placeholder = document.getElementById('generalPlaceholder');
             const result = document.getElementById('generalResultBox');
             
-            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Processing...`;
+            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Processing Multimodal Payload...`;
             btn.disabled = true;
 
             try {
                 const response = await fetch('/ask-general', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ studentQuestion: question, studentName: fallbackName, fileData: attachedFileData, fileType: attachedFileType })
+                    body: JSON.stringify({ 
+                        studentQuestion: question, 
+                        studentName: fallbackName, 
+                        fileData: attachedFileData, 
+                        fileType: attachedFileType 
+                    })
                 });
 
                 const data = await response.json();
+                
+                if (!response.ok) throw new Error(data.response || "Server processing matrix exception.");
+
                 document.getElementById('generalResponseText').innerText = data.response;
                 
                 placeholder.classList.add('hidden');
                 result.classList.remove('hidden');
                 result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-                // Archive conversation variables to history maps
                 saveHistoryItem('chats', {
                     question: question || "Sent file layout parameter snap.",
                     response: data.response,
@@ -528,8 +544,9 @@
 
                 document.getElementById('generalQuestion').value = "";
                 clearSelectedFile();
+
             } catch (err) {
-                alert("Communication crash with general knowledge engine.");
+                alert(err.message || "Communication crash with general knowledge engine.");
             } finally {
                 btn.innerHTML = `<i class="fas fa-paper-plane"></i> Send`;
                 btn.disabled = false;
