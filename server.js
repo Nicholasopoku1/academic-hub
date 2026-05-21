@@ -83,8 +83,18 @@ app.post('/ask-general', async (req, res) => {
         }
 
         let userContentArray = [{ type: "text", text: textPrompt }];
+        
         if (fileData && fileType && fileType.startsWith('image/')) {
-            userContentArray.push({ type: "image_url", image_url: { url: fileData } });
+            // FIX: Validates if data url headers are attached to prevent API blockages
+            let formattedImageUrl = fileData;
+            if (!formattedImageUrl.startsWith('data:')) {
+                formattedImageUrl = `data:${fileType};base64,${fileData}`;
+            }
+
+            userContentArray.push({ 
+                type: "image_url", 
+                image_url: { url: formattedImageUrl } 
+            });
         }
 
         const chatCompletion = await groq.chat.completions.create({
@@ -95,12 +105,14 @@ app.post('/ask-general', async (req, res) => {
                 },
                 { role: "user", content: userContentArray }
             ],
+            // STABLE PRODUCTION MODEL LINK
             model: "llama-3.2-11b-vision-preview"
         });
+        
         res.json({ response: chatCompletion.choices[0].message.content });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ response: `AI Processing Matrix Blocked: ${error.message || "Check file sizes."}` });
+        console.error("General Assistant Error:", error);
+        res.status(500).json({ response: `AI Processing Matrix Blocked: ${error.message || "Check engine configurations."}` });
     }
 });
 
