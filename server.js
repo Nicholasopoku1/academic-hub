@@ -1,14 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const Groq = require('groq-sdk');
-const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize clients securely using environment variables
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Initialize the Groq client securely using environment variables
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY 
+});
 
 // Expanded JSON limit handles larger base64 file payloads smoothly
 app.use(express.json({ limit: '10mb' }));
@@ -24,11 +24,17 @@ app.post('/api/signup', (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ error: "Missing identity validation metrics." });
         }
+
         const userExists = localUsersTable.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (userExists) {
             return res.status(400).json({ error: "Profile coordinates already initialized." });
         }
-        localUsersTable.push({ email: email.toLowerCase(), password: password });
+
+        localUsersTable.push({ 
+            email: email.toLowerCase(), 
+            password: password 
+        });
+
         res.json({ success: true, message: "Profile mapped completely!" });
     } catch (err) {
         res.status(500).json({ error: "Internal registry transaction crash." });
@@ -42,10 +48,12 @@ app.post('/api/login', (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ error: "Parameters incomplete." });
         }
+
         const user = localUsersTable.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
         if (!user) {
             return res.status(401).json({ error: "Invalid operational access credentials." });
         }
+
         res.json({ success: true, email: user.email });
     } catch (err) {
         res.status(500).json({ error: "Security layer comparison fault." });
@@ -56,6 +64,7 @@ app.post('/api/login', (req, res) => {
 app.post('/check-academic', async (req, res) => {
     try {
         const { studentName, currentGpa, studentChallenge } = req.body;
+
         const chatCompletion = await groq.chat.completions.create({
             messages: [
                 {
@@ -63,7 +72,7 @@ app.post('/check-academic', async (req, res) => {
                     content: `You are the official AI duplicate of Nicholas Opoku, elite academic advisor, tech specialist at UCC, and author of the book 'Life Mastery'. 
                     Your mission is to engineer academic and professional excellence for university students. 
                     Always use the core pillars of Nicholas's 'Life Mastery' framework: Mindset Alignment, Skill Acquisition, and Intentional Execution.
-                    Speak directly to the student. Be sharp, inspiring, and end with a powerful 'Life Mastery Principle'.`
+                    Speak directly to the student using their name. Be sharp, deeply inspiring, and authoritative. End with a powerful 'Life Mastery Principle'.`
                 },
                 {
                     role: "user",
@@ -72,24 +81,36 @@ app.post('/check-academic', async (req, res) => {
             ],
             model: "llama-3.3-70b-versatile"
         });
-        res.json({ message: `Life Mastery Blueprint for ${studentName}:`, advice: chatCompletion.choices[0].message.content });
+
+        res.json({
+            message: `Life Mastery Blueprint for ${studentName}:`,
+            advice: chatCompletion.choices[0].message.content
+        });
+
     } catch (error) {
-        res.status(500).json({ message: "System Error", advice: "AI Mentor is adjusting gears." });
+        console.error("Groq AI Error:", error);
+        res.status(500).json({
+            message: "System Error",
+            advice: "Our AI Mentor is configuring its gears. Check your API key and terminal connections!"
+        });
     }
 });
 
-// MODULE 2 ENDPOINT: General Assistant (Powered by Gemini 2.5 Multimodal Architecture)
+// MODULE 2 ENDPOINT: General Assistant (Powered by Dynamic ESM Google Gen AI Import)
 app.post('/ask-general', async (req, res) => {
     try {
         const { studentQuestion, studentName, fileData, fileType } = req.body;
 
+        // CRUCIAL WORKAROUND: Dynamically import the ESM library inside the runtime execution stack
+        const { GoogleGenAI } = await import('@google/genai');
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
         let systemInstruction = `You are the official AI duplicate of Nicholas Opoku, academic advisor, tech specialist at UCC, and author of 'Life Mastery'. Answer tech, career, or programming questions. Keep it punchy, structure with bullet points, and end with a motivational punchline in Nicholas Opoku's signature voice.`;
         let textPrompt = `My name is ${studentName || "Scholar"}. Here is my question: "${studentQuestion || "See attached data layer."}"`;
 
-        // Array containing parts for the Gemini content model request
         let contentsArray = [];
 
-        // Handle document text or PDF notation parameters
+        // Process standard text attachments or documents
         if (fileData && fileType && !fileType.startsWith('image/')) {
             if (fileType === 'application/pdf') {
                 textPrompt += `\n\n[System Notification: Student uploaded a reference document via PDF stream context].`;
@@ -98,14 +119,11 @@ app.post('/ask-general', async (req, res) => {
             }
         }
 
-        // Push primary text prompt package
         contentsArray.push(textPrompt);
 
-        // If an image asset is passed, transform it into Gemini SDK inlineData format objects smoothly
+        // If a camera picture snapshot is sent, parse it directly into Gemini's native inlineData configuration array
         if (fileData && fileType && fileType.startsWith('image/')) {
-            // Strip any Data URL schema prefix to extract pure base64 byte text blocks if present
             const cleanBase64 = fileData.split(',')[1] || fileData;
-            
             contentsArray.push({
                 inlineData: {
                     mimeType: fileType,
@@ -114,7 +132,7 @@ app.post('/ask-general', async (req, res) => {
             });
         }
 
-        // Execute generation turn on Gemini Flash Engine
+        // Execute turning call on Gemini Flash Engine
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: contentsArray,
@@ -123,11 +141,18 @@ app.post('/ask-general', async (req, res) => {
             }
         });
 
-        res.json({ response: response.text });
+        res.json({
+            response: response.text
+        });
+
     } catch (error) {
         console.error("Gemini AI Engine Fault:", error);
-        res.status(500).json({ response: `Gemini Processing Blocked: ${error.message || "Verify file structure or validation key handles."}` });
+        res.status(500).json({
+            response: `Gemini Processing Blocked: ${error.message || "Verify file structure or validation key handles."}`
+        });
     }
 });
 
-app.listen(PORT, () => console.log("Server running live on port " + PORT));
+app.listen(PORT, () => {
+    console.log("Server is running live on port " + PORT);
+});
