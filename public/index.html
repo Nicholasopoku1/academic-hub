@@ -24,9 +24,29 @@
                     <input type="email" id="authEmail" placeholder="yourname@domain.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
                 </div>
                 
-                <div id="authProgramWrapper" class="hidden">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Academic Program / Major</label>
-                    <input type="text" id="authProgram" placeholder="e.g., Computer Science, BCom" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
+                <div id="authProgramWrapper" class="hidden space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Academic Program / Major</label>
+                        <input type="text" id="authProgram" placeholder="e.g., Computer Science, BCom" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Current Level</label>
+                            <select id="authLevel" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition cursor-pointer">
+                                <option value="100">Level 100</option>
+                                <option value="200">Level 200</option>
+                                <option value="300">Level 300</option>
+                                <option value="400">Level 400</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Active Semester</label>
+                            <select id="authSemester" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition cursor-pointer">
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 
                 <div>
@@ -104,33 +124,51 @@
         </div>
         
         <div class="md:col-span-5 flex justify-center w-full">
-            <div class="relative w-full max-w-sm bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between shadow-2xl overflow-hidden group">
+            <div class="relative w-full max-w-sm bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between shadow-2xl overflow-hidden group">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl"></div>
                 
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center border-b border-slate-800/80 pb-3">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
                         <span class="text-xs font-black uppercase tracking-widest text-amber-400"><i class="fas fa-id-card mr-1.5"></i>Scholar Card</span>
                         <span class="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">Connected</span>
                     </div>
                     
-                    <div class="space-y-3">
+                    <div class="space-y-2.5">
                         <p class="text-xs text-slate-400">
                             <strong class="text-white font-medium block text-[10px] uppercase text-slate-500 tracking-wider mb-0.5">Active ID Coordinates</strong> 
                             <span id="cardUserEmail" class="font-mono text-slate-300">Loading token...</span>
                         </p>
                         
                         <div>
-                            <label class="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1.5">Your Configured Program</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="profileProgramInput" value="Loading settings..." class="bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-lg p-2.5 text-xs text-white focus:outline-none w-full transition">
-                                <button onclick="updateUserProgramProfile()" title="Save Program Vector" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-2.5 rounded-lg text-xs transition">
-                                    <i class="fas fa-save"></i>
-                                </button>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Program of Study</label>
+                            <input type="text" id="profileProgramInput" value="Loading settings..." class="bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-lg p-2.5 text-xs text-white focus:outline-none w-full transition">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Level</label>
+                                <select id="profileLevelInput" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-lg p-2.5 text-xs text-white focus:outline-none transition cursor-pointer">
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                    <option value="300">300</option>
+                                    <option value="400">400</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Semester</label>
+                                <select id="profileSemesterInput" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-lg p-2.5 text-xs text-white focus:outline-none transition cursor-pointer">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                </select>
                             </div>
                         </div>
+
+                        <button onclick="updateUserProgramProfile()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-md">
+                            <i class="fas fa-save"></i> Save Profile Settings
+                        </button>
                     </div>
                 </div>
-                <div class="text-[10px] text-slate-500 border-t border-slate-800/80 pt-4 mt-6 font-mono flex justify-between items-center">
+                <div class="text-[10px] text-slate-500 border-t border-slate-800/80 pt-3 mt-4 font-mono flex justify-between items-center">
                     <span>Life Mastery Framework</span>
                     <span>© 2026</span>
                 </div>
@@ -284,14 +322,36 @@
         let attachedFileType = null;
         let currentUserEmail = null; 
         let userConfiguredProgram = "General";
+        let userConfiguredLevel = "100";
+        let userConfiguredSemester = "1";
 
-        // MASTER ACADEMIC CATALOG ARCHITECTURE ARRAY
+        // UCC CURRICULUM CATALOG ARCHITECTURE (WITH LEVEL & SEMESTER FIELDS)
         const universityCatalog = [
-            { program: "Computer Science", courseCode: "CMS 201", title: "Data Structures & Algorithms", type: "Slides & Source Code", downloadUrl: "#" },
-            { program: "Computer Science", courseCode: "CMS 203", title: "Web Development Frameworks", type: "Handouts & Projects", downloadUrl: "#" },
-            { program: "Computer Science", courseCode: "INF 205", title: "Database Systems Architecture", type: "Lab Schemas", downloadUrl: "#" },
-            { program: "Business Administration", courseCode: "BUS 101", title: "Principles of Management", type: "Core Course Slides", downloadUrl: "#" },
-            { program: "Mathematics", courseCode: "MAT 102", title: "Calculus with Analytic Geometry", type: "Past Questions", downloadUrl: "#" }
+            { 
+                program: "Computer Science", level: "100", semester: "1", courseCode: "SBU 105", 
+                title: "Introduction to Computing & Hardware Design", type: "Core Curricular Reference Handout", 
+                downloadUrl: "https://curriculumresources.edu.gh/wp-content/uploads/2024/09/Computing.pdf" 
+            },
+            { 
+                program: "Computer Science", level: "200", semester: "1", courseCode: "CMS 201", 
+                title: "Data Structures, Algorithms & Objects", type: "UCC Faculty Guide & Syllabi", 
+                downloadUrl: "https://dcsit.ucc.edu.gh/" 
+            },
+            { 
+                program: "Computer Science", level: "200", semester: "2", courseCode: "CMS 203", 
+                title: "Web Technologies & Framework Development", type: "MDN Live Developer Web Resources", 
+                downloadUrl: "https://developer.mozilla.org/en-US/docs/Learn"
+            },
+            { 
+                program: "Computer Science", level: "200", semester: "2", courseCode: "INF 205", 
+                title: "Database Systems Architecture & Relational Modeling", type: "W3Schools SQL Production Reference", 
+                downloadUrl: "https://www.w3schools.com/sql/"
+            },
+            { 
+                program: "Mathematics", level: "100", semester: "2", courseCode: "MAT 102", 
+                title: "Calculus & Analytical Geometry Systems", type: "UCC Digital Library Repository Archive", 
+                downloadUrl: "https://archive.ucc.edu.gh/" 
+            }
         ];
 
         function toggleAuthMode() {
@@ -315,7 +375,7 @@
                 switchText.innerText = "Already registered within the hub?";
                 switchBtn.innerText = "Sign In";
                 confirmWrapper.classList.remove('hidden');
-                programWrapper.classList.remove('hidden'); // SHOW Program choice field on Sign Up
+                programWrapper.classList.remove('hidden');
             } else {
                 title.innerText = "Access Life Mastery Engine";
                 subtitle.innerText = "Log in to process blueprints and unlock the general knowledge base.";
@@ -323,7 +383,7 @@
                 switchText.innerText = "New scholar to the ecosystem?";
                 switchBtn.innerText = "Create Account";
                 confirmWrapper.classList.add('hidden');
-                programWrapper.classList.add('hidden'); // HIDE Program choice field on Sign In
+                programWrapper.classList.add('hidden');
             }
         }
 
@@ -341,6 +401,8 @@
             const password = document.getElementById('authPassword').value;
             const confirmPassword = document.getElementById('authConfirmPassword').value;
             const program = document.getElementById('authProgram').value;
+            const level = document.getElementById('authLevel').value;
+            const semester = document.getElementById('authSemester').value;
             const btn = document.getElementById('authSubmitBtn');
 
             if (!email || !password) {
@@ -370,7 +432,7 @@
                 const res = await fetch(targetUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password, program })
+                    body: JSON.stringify({ email, password, program, level, semester })
                 });
 
                 const data = await res.json();
@@ -401,7 +463,6 @@
                 document.getElementById('cardUserEmail').innerText = token;
                 overlay.classList.add('hidden');
                 
-                // Fetch current configuration vectors from Firestore database architecture
                 await fetchAndUpdateUserDashboardConfiguration();
                 renderUserSavedHistories(); 
             } else {
@@ -419,8 +480,14 @@
                 const data = await res.json();
                 if (res.ok) {
                     userConfiguredProgram = data.program || "General";
+                    userConfiguredLevel = data.level || "100";
+                    userConfiguredSemester = data.semester || "1";
+
                     document.getElementById('profileProgramInput').value = userConfiguredProgram;
-                    renderMaterialVault(); // Populates localized grid outputs matching configuration variables
+                    document.getElementById('profileLevelInput').value = userConfiguredLevel;
+                    document.getElementById('profileSemesterInput').value = userConfiguredSemester;
+                    
+                    renderMaterialVault(); 
                 }
             } catch (err) {
                 console.error("Failed to fetch user database profile details.");
@@ -429,6 +496,9 @@
 
         async function updateUserProgramProfile() {
             const programValue = document.getElementById('profileProgramInput').value;
+            const levelValue = document.getElementById('profileLevelInput').value;
+            const semesterValue = document.getElementById('profileSemesterInput').value;
+
             if (!programValue.trim()) {
                 alert("Program field cannot be evaluated as blank.");
                 return;
@@ -438,12 +508,19 @@
                 const res = await fetch('/api/update-profile', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUserEmail, program: programValue })
+                    body: JSON.stringify({ 
+                        email: currentUserEmail, 
+                        program: programValue, 
+                        level: levelValue, 
+                        semester: semesterValue 
+                    })
                 });
                 const data = await res.json();
                 if (res.ok) {
                     alert(data.message);
                     userConfiguredProgram = programValue;
+                    userConfiguredLevel = levelValue;
+                    userConfiguredSemester = semesterValue;
                     renderMaterialVault();
                 } else {
                     alert(data.error);
@@ -453,18 +530,28 @@
             }
         }
 
-        // INTELLIGENT MATERIAL CATALOG FILTERING AND RENDERING ENGINE
+        // THREE-DIMENSIONAL RE-ORDERING VAULT LOGIC ENGINE
         function renderMaterialVault(items = universityCatalog) {
             const grid = document.getElementById('vaultGrid');
             if (!grid) return;
 
             const userProgramLower = userConfiguredProgram.toLowerCase().trim();
+            const targetLevel = userConfiguredLevel.trim();
+            const targetSemester = userConfiguredSemester.trim();
             
-            // Re-order sorting hierarchy layout parameters so matching program items float to absolute top precedence
+            // Re-order layout dynamically sorting accurate matching cards to topmost positions
             const sortedItems = [...items].sort((a, b) => {
-                const aMatch = a.program.toLowerCase().includes(userProgramLower);
-                const bMatch = b.program.toLowerCase().includes(userProgramLower);
-                return bMatch - aMatch;
+                const aProgMatch = a.program.toLowerCase().includes(userProgramLower);
+                const bProgMatch = b.program.toLowerCase().includes(userProgramLower);
+                
+                const aFullMatch = aProgMatch && (a.level === targetLevel) && (a.semester === targetSemester);
+                const bFullMatch = bProgMatch && (b.level === targetLevel) && (b.semester === targetSemester);
+                
+                if (aFullMatch && !bFullMatch) return -1;
+                if (!aFullMatch && bFullMatch) return 1;
+                if (aProgMatch && !bProgMatch) return -1;
+                if (!aProgMatch && bProgMatch) return 1;
+                return 0;
             });
 
             if (sortedItems.length === 0) {
@@ -473,20 +560,34 @@
             }
 
             grid.innerHTML = sortedItems.map(item => {
-                const isPersonalizedMatch = item.program.toLowerCase().includes(userProgramLower);
+                const isProgramMatch = item.program.toLowerCase().includes(userProgramLower);
+                const isFullAcademicMatch = isProgramMatch && (item.level === targetLevel) && (item.semester === targetSemester);
+                
                 return `
-                    <div class="bg-slate-950 border ${isPersonalizedMatch ? 'border-amber-500/30 shadow-lg shadow-amber-500/5' : 'border-slate-800/80'} hover:border-amber-500/60 p-4 rounded-xl flex flex-col justify-between gap-4 transition group relative overflow-hidden">
-                        ${isPersonalizedMatch ? '<div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded font-bold"><i class="fas fa-star mr-1"></i>Your Program</div>' : ''}
+                    <div class="bg-slate-950 border ${isFullAcademicMatch ? 'border-amber-400 shadow-md shadow-amber-500/10' : (isProgramMatch ? 'border-amber-500/20' : 'border-slate-800/80')} hover:border-amber-500/60 p-4 rounded-xl flex flex-col justify-between gap-4 transition group relative overflow-hidden">
+                        
+                        ${isFullAcademicMatch ? `
+                            <div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded font-black flex items-center gap-1">
+                                <i class="fas fa-star text-[7px]"></i> Exact Sem Match
+                            </div>` : (isProgramMatch ? `
+                            <div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded font-bold">
+                                L${item.level} S${item.semester}
+                            </div>` : `
+                            <div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-slate-900 text-slate-500 px-1.5 py-0.5 rounded">
+                                L${item.level} S${item.semester}
+                            </div>`)
+                        }
+
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <span class="text-[9px] font-mono tracking-wider text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded uppercase font-semibold">${item.courseCode}</span>
-                                <span class="text-[10px] text-slate-500 font-medium"><i class="fas fa-file-pdf mr-1 text-red-500/70"></i>${item.type}</span>
+                                <span class="text-[10px] text-slate-500 font-medium"><i class="fas fa-external-link-alt mr-1 text-sky-400/80"></i>${item.type}</span>
                             </div>
                             <h4 class="text-xs font-bold text-slate-200 group-hover:text-amber-400 transition line-clamp-1">${item.title}</h4>
                             <p class="text-[10px] text-slate-500 font-medium">${item.program}</p>
                         </div>
                         <a href="${item.downloadUrl}" target="_blank" class="w-full bg-slate-900 hover:bg-amber-500 border border-slate-800 group-hover:border-transparent text-slate-300 group-hover:text-slate-950 font-bold text-center py-2 rounded-lg text-[11px] transition flex items-center justify-center gap-1.5 shadow-md">
-                            <i class="fas fa-cloud-download-alt text-xs"></i> Access Resource
+                            <i class="fas fa-external-link-alt text-xs"></i> Launch Web Resource
                         </a>
                     </div>
                 `;
