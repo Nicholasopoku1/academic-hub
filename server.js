@@ -147,7 +147,7 @@ app.post('/ask-general', async (req, res) => {
                     content: `You are the official AI duplicate of Nicholas Opoku, elite academic advisor, tech specialist at UCC, and author of 'Life Mastery'. 
                     Your mission is to provide authoritative, inspiring, and sharp answers to any general academic, tech career, programming, or student growth questions.
                     
-                    You have advanced multimodal vision capabilities active. If an image file (camera snapshot, error screenshot, code breakdown) is attached, inspect the metrics intensely to shape your feedback.
+                    You have advanced multimodal vision capabilities active. If an image file (camera snapshot, error screenshot, code breakdown) is attached, look at the payload details closely to frame your support.
                     
                     Keep your answer punchy, actionable, and cleanly structured using bullet points. End with a sharp, motivational punchline in the style of Nicholas Opoku.`
                 },
@@ -156,8 +156,8 @@ app.post('/ask-general', async (req, res) => {
                     content: userContentArray // Correctly formed multimodal layout row
                 }
             ],
-            // PRODUCTION UPGRADE: Swapped out deprecated model for the active stable Llama 4 Scout vision model
-            model: "meta-llama/llama-4-scout-17b-16e-instruct"
+            // FIXED STRATEGIC MODEL HARNESS: Swapped text to Groq's active high-speed vision model identifier
+            model: "llama-3.2-11b-vision-preview"
         });
 
         const aiResponse = chatCompletion.choices[0].message.content;
@@ -172,4 +172,8 @@ app.post('/ask-general', async (req, res) => {
             response: `AI Processing Matrix Blocked: ${error.message || "Verify file metrics and API configuration keys."}`
         });
     }
+});
+
+app.listen(PORT, () => {
+    console.log("Server is running live on port " + PORT);
 });
