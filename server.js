@@ -8,45 +8,28 @@ const PORT = process.env.PORT || 3000;
 // FIREBASE ADMIN STORAGE INITIALIZATION
 // ==========================================
 const admin = require('firebase-admin');
+const fs = require('fs');
+const path = require('path');
 
 try {
-    let serviceAccountData;
-
-    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-        const parsedCredentials = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-        
-        // FIX: Re-maps key values and cleans text-escaped newline sequences
-        serviceAccountData = {
-            type: parsedCredentials.type,
-            projectId: parsedCredentials.project_id,
-            privateKeyId: parsedCredentials.private_key_id,
-            privateKey: parsedCredentials.private_key.replace(/\\n/g, '\n'),
-            clientEmail: parsedCredentials.client_email,
-            clientId: parsedCredentials.client_id,
-            authUri: parsedCredentials.auth_uri,
-            tokenUri: parsedCredentials.token_uri,
-            authProviderX509CertUrl: parsedCredentials.auth_provider_x509_cert_url,
-            clientX509CertUrl: parsedCredentials.client_x509_cert_url
-        };
+    // Looks for the file locally or dynamically fetched via Render Secret Files mount points
+    const keyPath = path.join(__dirname, 'firebase-key.json');
+    
+    if (fs.existsSync(keyPath)) {
+        const serviceAccountData = require(keyPath);
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccountData)
+        });
+        console.log("Firestore Database Layer Successfully Initialized!");
     } else {
-        serviceAccountData = require('./firebase-key.json'); // Local desktop backup fallback
+        console.warn("WARNING: firebase-key.json file missing. Database routes will remain inactive.");
     }
-
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountData)
-    });
-    console.log("Firestore Database Layer Successfully Initialized!");
 } catch (error) {
     console.error("Firestore Initialization Error:", error.message);
 }
 
 const db = admin.firestore();
 const usersCollection = db.collection('users');
-
-// Expanded JSON limit handles larger base64 file payloads smoothly
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(express.static('public'));
 
 
 // ==========================================
