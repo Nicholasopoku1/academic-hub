@@ -122,7 +122,7 @@ app.post('/ask-general', async (req, res) => {
             }
         }
 
-        // CRITICAL REFACTOR: Structuring the user content block to strictly comply with Groq Multimodal API syntax rules
+        // Structuring the user content block to strictly comply with Groq Multimodal API syntax rules
         let userContentArray = [
             {
                 type: "text",
@@ -147,7 +147,7 @@ app.post('/ask-general', async (req, res) => {
                     content: `You are the official AI duplicate of Nicholas Opoku, elite academic advisor, tech specialist at UCC, and author of 'Life Mastery'. 
                     Your mission is to provide authoritative, inspiring, and sharp answers to any general academic, tech career, programming, or student growth questions.
                     
-                    You have advanced multimodal vision capabilities active. If an image file (camera snapshot, error screenshot, code breakdown) is attached, inspect the array metrics intensely to shape your feedback.
+                    You have advanced multimodal vision capabilities active. If an image file (camera snapshot, error screenshot, code breakdown) is attached, inspect the metrics intensely to shape your feedback.
                     
                     Keep your answer punchy, actionable, and cleanly structured using bullet points. End with a sharp, motivational punchline in the style of Nicholas Opoku.`
                 },
@@ -156,7 +156,8 @@ app.post('/ask-general', async (req, res) => {
                     content: userContentArray // Correctly formed multimodal layout row
                 }
             ],
-            model: "llama-3.2-90b-vision-instruct"
+            // PRODUCTION UPGRADE: Swapped out deprecated model for the active stable Llama 4 Scout vision model
+            model: "meta-llama/llama-4-scout-17b-16e-instruct"
         });
 
         const aiResponse = chatCompletion.choices[0].message.content;
@@ -171,8 +172,4 @@ app.post('/ask-general', async (req, res) => {
             response: `AI Processing Matrix Blocked: ${error.message || "Verify file metrics and API configuration keys."}`
         });
     }
-});
-
-app.listen(PORT, () => {
-    console.log("Server is running live on port " + PORT);
 });
