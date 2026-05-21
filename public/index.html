@@ -21,7 +21,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Email Parameters</label>
-                    <input type="email" id="authEmail" placeholder="yourname@domain.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
+                    <input type="email" id="authEmail" placeholder="yourname@domain.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-700">
                 </div>
                 
                 <div id="authProgramWrapper" class="hidden space-y-3">
@@ -61,7 +61,7 @@
 
                 <div class="flex items-center gap-2 pt-1">
                     <input type="checkbox" id="showPasswordToggle" class="w-4 h-4 rounded accent-amber-500 bg-slate-950 border-slate-800 cursor-pointer">
-                    <label for="showPasswordToggle" class="text-xs text-slate-400 selection:bg-transparent select-none cursor-pointer hover:text-slate-300 transition">Show Passwords</label>
+                    <label for="showPasswordToggle" class="text-xs text-slate-400 select-none cursor-pointer hover:text-slate-300 transition">Show Passwords</label>
                 </div>
 
                 <button onclick="handleAuthAction()" id="authSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-3 rounded-lg text-sm tracking-wide transition mt-2 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10">
@@ -181,14 +181,36 @@
     <main id="hub" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-16">
         
         <div id="materials-vault" class="bg-slate-900/40 border border-slate-800/80 p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
-                <div>
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-6">
+                <div class="space-y-1">
                     <h3 class="text-xl font-black bg-gradient-to-r from-white via-slate-200 to-amber-400 bg-clip-text text-transparent"><i class="fas fa-folder-open text-amber-500 mr-2"></i>Open-Source Material Vault</h3>
-                    <p class="text-xs text-slate-400">Displaying free lecture material coordinates synchronized to your program framework.</p>
+                    <p class="text-xs text-slate-400">Explore and download academic lecture documents across all university frameworks.</p>
                 </div>
-                <div class="relative w-full md:w-72">
-                    <i class="fas fa-search absolute left-3 top-3.5 text-slate-500 text-xs"></i>
-                    <input type="text" id="vaultSearch" onkeyup="filterVaultMaterials()" placeholder="Search course code, program or title..." class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-700">
+                
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <div class="bg-slate-950 p-1 rounded-xl border border-slate-800/80 flex items-center gap-1 text-[11px] font-bold">
+                        <button onclick="switchVaultViewScope('personalized')" id="scopeBtnPersonalized" class="px-3 py-1.5 rounded-lg text-amber-400 bg-amber-500/10 transition">My Semester</button>
+                        <button onclick="switchVaultViewScope('all')" id="scopeBtnAll" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition">Browse All</button>
+                    </div>
+                    
+                    <select id="vaultLevelSelector" onchange="applyVaultInlineFilters()" class="bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-400 transition cursor-pointer">
+                        <option value="ALL">All Levels</option>
+                        <option value="100">Level 100</option>
+                        <option value="200">Level 200</option>
+                        <option value="300">Level 300</option>
+                        <option value="400">Level 400</option>
+                    </select>
+
+                    <select id="vaultSemesterSelector" onchange="applyVaultInlineFilters()" class="bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-400 transition cursor-pointer">
+                        <option value="ALL">All Semesters</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                    </select>
+
+                    <div class="relative flex-1 sm:flex-initial">
+                        <i class="fas fa-search absolute left-3 top-3 text-slate-500 text-xs"></i>
+                        <input type="text" id="vaultSearch" onkeyup="applyVaultInlineFilters()" placeholder="Search program, code..." class="bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-700 w-full sm:w-48">
+                    </div>
                 </div>
             </div>
 
@@ -321,37 +343,20 @@
         let attachedFileData = null;
         let attachedFileType = null;
         let currentUserEmail = null; 
+        
+        // Dynamic application settings tracking state vectors
         let userConfiguredProgram = "General";
         let userConfiguredLevel = "100";
         let userConfiguredSemester = "1";
+        let activeVaultScope = "personalized"; // Options: 'personalized' or 'all'
 
-        // UCC CURRICULUM CATALOG ARCHITECTURE (WITH LEVEL & SEMESTER FIELDS)
+        // COMPREHENSIVE CURRICULUM CATALOG
         const universityCatalog = [
-            { 
-                program: "Computer Science", level: "100", semester: "1", courseCode: "SBU 105", 
-                title: "Introduction to Computing & Hardware Design", type: "Core Curricular Reference Handout", 
-                downloadUrl: "https://curriculumresources.edu.gh/wp-content/uploads/2024/09/Computing.pdf" 
-            },
-            { 
-                program: "Computer Science", level: "200", semester: "1", courseCode: "CMS 201", 
-                title: "Data Structures, Algorithms & Objects", type: "UCC Faculty Guide & Syllabi", 
-                downloadUrl: "https://dcsit.ucc.edu.gh/" 
-            },
-            { 
-                program: "Computer Science", level: "200", semester: "2", courseCode: "CMS 203", 
-                title: "Web Technologies & Framework Development", type: "MDN Live Developer Web Resources", 
-                downloadUrl: "https://developer.mozilla.org/en-US/docs/Learn"
-            },
-            { 
-                program: "Computer Science", level: "200", semester: "2", courseCode: "INF 205", 
-                title: "Database Systems Architecture & Relational Modeling", type: "W3Schools SQL Production Reference", 
-                downloadUrl: "https://www.w3schools.com/sql/"
-            },
-            { 
-                program: "Mathematics", level: "100", semester: "2", courseCode: "MAT 102", 
-                title: "Calculus & Analytical Geometry Systems", type: "UCC Digital Library Repository Archive", 
-                downloadUrl: "https://archive.ucc.edu.gh/" 
-            }
+            { program: "Computer Science", level: "100", semester: "1", courseCode: "SBU 105", title: "Introduction to Computing & Hardware Design", type: "Core Curricular Reference Handout", downloadUrl: "https://curriculumresources.edu.gh/wp-content/uploads/2024/09/Computing.pdf" },
+            { program: "Computer Science", level: "200", semester: "1", courseCode: "CMS 201", title: "Data Structures, Algorithms & Objects", type: "UCC Faculty Guide & Syllabi", downloadUrl: "https://dcsit.ucc.edu.gh/" },
+            { program: "Computer Science", level: "200", semester: "2", courseCode: "CMS 203", title: "Web Technologies & Framework Development", type: "MDN Live Developer Web Resources", downloadUrl: "https://developer.mozilla.org/en-US/docs/Learn" },
+            { program: "Computer Science", level: "200", semester: "2", courseCode: "INF 205", title: "Database Systems Architecture & Relational Modeling", type: "W3Schools SQL Production Reference", downloadUrl: "https://www.w3schools.com/sql/" },
+            { program: "Mathematics", level: "100", semester: "2", courseCode: "MAT 102", title: "Calculus & Analytical Geometry Systems", type: "UCC Digital Library Repository Archive", downloadUrl: "https://archive.ucc.edu.gh/" }
         ];
 
         function toggleAuthMode() {
@@ -391,7 +396,6 @@
             const passwordInput = document.getElementById('authPassword');
             const confirmPasswordInput = document.getElementById('authConfirmPassword');
             const visualState = this.checked ? 'text' : 'password';
-            
             passwordInput.type = visualState;
             confirmPasswordInput.type = visualState;
         });
@@ -415,17 +419,15 @@
                     alert("Security Matrix Rejection: Input passwords do not match each other.");
                     return;
                 }
-
                 const strictPasswordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,18}$/;
                 if (!strictPasswordRegex.test(password)) {
-                    alert("Security Standard Unmet: Password must be 6 to 18 characters long and include at least one number and one symbol.");
+                    alert("Security Standard Unmet: Password must be 6 to 18 characters long and include numbers and symbols.");
                     return;
                 }
             }
 
             btn.disabled = true;
             btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Processing Security Matrix...`;
-
             const targetUrl = isSignUpMode ? '/api/signup' : '/api/login';
 
             try {
@@ -487,7 +489,7 @@
                     document.getElementById('profileLevelInput').value = userConfiguredLevel;
                     document.getElementById('profileSemesterInput').value = userConfiguredSemester;
                     
-                    renderMaterialVault(); 
+                    applyVaultInlineFilters(); // Triggers localized rendering
                 }
             } catch (err) {
                 console.error("Failed to fetch user database profile details.");
@@ -500,7 +502,7 @@
             const semesterValue = document.getElementById('profileSemesterInput').value;
 
             if (!programValue.trim()) {
-                alert("Program field cannot be evaluated as blank.");
+                alert("Program field cannot be blank.");
                 return;
             }
 
@@ -521,7 +523,7 @@
                     userConfiguredProgram = programValue;
                     userConfiguredLevel = levelValue;
                     userConfiguredSemester = semesterValue;
-                    renderMaterialVault();
+                    applyVaultInlineFilters();
                 } else {
                     alert(data.error);
                 }
@@ -530,52 +532,99 @@
             }
         }
 
-        // THREE-DIMENSIONAL RE-ORDERING VAULT LOGIC ENGINE
-        function renderMaterialVault(items = universityCatalog) {
+        // SWITCH VIEW CONTROL SCOPE: Sets visibility constraints dynamically
+        function switchVaultViewScope(scope) {
+            activeVaultScope = scope;
+            const btnPersonalized = document.getElementById('scopeBtnPersonalized');
+            const btnAll = document.getElementById('scopeBtnAll');
+
+            if (scope === 'personalized') {
+                btnPersonalized.className = "px-3 py-1.5 rounded-lg text-amber-400 bg-amber-500/10 transition";
+                btnAll.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition";
+                
+                // Align inline selectors to user values automatically for visual clarity
+                document.getElementById('vaultLevelSelector').value = userConfiguredLevel;
+                document.getElementById('vaultSemesterSelector').value = userConfiguredSemester;
+            } else {
+                btnAll.className = "px-3 py-1.5 rounded-lg text-amber-400 bg-amber-500/10 transition";
+                btnPersonalized.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition";
+                
+                // Open selectors up to showcase everything comprehensively
+                document.getElementById('vaultLevelSelector').value = "ALL";
+                document.getElementById('vaultSemesterSelector').value = "ALL";
+            }
+            applyVaultInlineFilters();
+        }
+
+        // UNCONDITIONAL MULTI-VARIABLE INLINE FILTER METER
+        function applyVaultInlineFilters() {
+            const searchQuery = document.getElementById('vaultSearch').value.toLowerCase().trim();
+            const inlineLevel = document.getElementById('vaultLevelSelector').value;
+            const inlineSemester = document.getElementById('vaultSemesterSelector').value;
+
+            const userProgramLower = userConfiguredProgram.toLowerCase().trim();
+
+            const filteredMaterials = universityCatalog.filter(item => {
+                // 1. Keyword validation loop (Check code, program or course title strings)
+                const matchesKeyword = item.title.toLowerCase().includes(searchQuery) || 
+                                       item.courseCode.toLowerCase().includes(searchQuery) ||
+                                       item.program.toLowerCase().includes(searchQuery);
+
+                if (!matchesKeyword) return false;
+
+                // 2. Evaluation routing based on active toggle states
+                if (activeVaultScope === 'personalized') {
+                    // Strictly match user program department limits, then follow explicit dropdown selections
+                    const belongsToProgram = item.program.toLowerCase().includes(userProgramLower);
+                    if (!belongsToProgram) return false;
+
+                    if (inlineLevel !== 'ALL' && item.level !== inlineLevel) return false;
+                    if (inlineSemester !== 'ALL' && item.semester !== inlineSemester) return false;
+                } else {
+                    // Browse All framework: Ignore profile constraints and filter purely on inline dropdown settings
+                    if (inlineLevel !== 'ALL' && item.level !== inlineLevel) return false;
+                    if (inlineSemester !== 'ALL' && item.semester !== inlineSemester) return false;
+                }
+
+                return true;
+            });
+
+            renderMaterialVault(filteredMaterials);
+        }
+
+        // UNIVERSAL HIGH-INTELLIGENCE VAULT RENDER CORE
+        function renderMaterialVault(items) {
             const grid = document.getElementById('vaultGrid');
             if (!grid) return;
 
-            const userProgramLower = userConfiguredProgram.toLowerCase().trim();
-            const targetLevel = userConfiguredLevel.trim();
-            const targetSemester = userConfiguredSemester.trim();
-            
-            // Re-order layout dynamically sorting accurate matching cards to topmost positions
-            const sortedItems = [...items].sort((a, b) => {
-                const aProgMatch = a.program.toLowerCase().includes(userProgramLower);
-                const bProgMatch = b.program.toLowerCase().includes(userProgramLower);
-                
-                const aFullMatch = aProgMatch && (a.level === targetLevel) && (a.semester === targetSemester);
-                const bFullMatch = bProgMatch && (b.level === targetLevel) && (b.semester === targetSemester);
-                
-                if (aFullMatch && !bFullMatch) return -1;
-                if (!aFullMatch && bFullMatch) return 1;
-                if (aProgMatch && !bProgMatch) return -1;
-                if (!aProgMatch && bProgMatch) return 1;
-                return 0;
-            });
-
-            if (sortedItems.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-slate-600 text-xs py-8 italic">No academic catalog elements match filter.</div>`;
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-slate-600 text-xs py-12 border border-dashed border-slate-900 rounded-xl bg-slate-950/20 italic"><i class="fas fa-search mb-2 text-xl block text-slate-800"></i>No academic resource variables match this specified track filter.</div>`;
                 return;
             }
 
-            grid.innerHTML = sortedItems.map(item => {
+            const userProgramLower = userConfiguredProgram.toLowerCase().trim();
+
+            // Intelligently rank matches so that items exact-matching the user's specific semester float to the top
+            const finalSortedItems = [...items].sort((a, b) => {
+                const aFullMatch = a.program.toLowerCase().includes(userProgramLower) && (a.level === userConfiguredLevel) && (a.semester === userConfiguredSemester);
+                const bFullMatch = b.program.toLowerCase().includes(userProgramLower) && (b.level === userConfiguredLevel) && (b.semester === userConfiguredSemester);
+                return bFullMatch - aFullMatch;
+            });
+
+            grid.innerHTML = finalSortedItems.map(item => {
                 const isProgramMatch = item.program.toLowerCase().includes(userProgramLower);
-                const isFullAcademicMatch = isProgramMatch && (item.level === targetLevel) && (item.semester === targetSemester);
+                const isExactSemesterMatch = isProgramMatch && (item.level === userConfiguredLevel) && (item.semester === userConfiguredSemester);
                 
                 return `
-                    <div class="bg-slate-950 border ${isFullAcademicMatch ? 'border-amber-400 shadow-md shadow-amber-500/10' : (isProgramMatch ? 'border-amber-500/20' : 'border-slate-800/80')} hover:border-amber-500/60 p-4 rounded-xl flex flex-col justify-between gap-4 transition group relative overflow-hidden">
+                    <div class="bg-slate-950 border ${isExactSemesterMatch ? 'border-amber-400 shadow-md shadow-amber-500/10' : (isProgramMatch ? 'border-amber-500/20' : 'border-slate-800/80')} hover:border-amber-500/60 p-4 rounded-xl flex flex-col justify-between gap-4 transition group relative overflow-hidden">
                         
-                        ${isFullAcademicMatch ? `
-                            <div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded font-black flex items-center gap-1">
+                        ${isExactSemesterMatch ? `
+                            <div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded font-black flex items-center gap-1 animate-pulse">
                                 <i class="fas fa-star text-[7px]"></i> Exact Sem Match
-                            </div>` : (isProgramMatch ? `
-                            <div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded font-bold">
-                                L${item.level} S${item.semester}
                             </div>` : `
-                            <div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest bg-slate-900 text-slate-500 px-1.5 py-0.5 rounded">
+                            <div class="absolute top-2 right-2 text-[8px] uppercase font-mono tracking-widest ${isProgramMatch ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-900 text-slate-500'} px-1.5 py-0.5 rounded font-medium">
                                 L${item.level} S${item.semester}
-                            </div>`)
+                            </div>`
                         }
 
                         <div class="space-y-1.5">
@@ -595,13 +644,8 @@
         }
 
         function filterVaultMaterials() {
-            const query = document.getElementById('vaultSearch').value.toLowerCase().trim();
-            const filtered = universityCatalog.filter(item => 
-                item.title.toLowerCase().includes(query) || 
-                item.courseCode.toLowerCase().includes(query) ||
-                item.program.toLowerCase().includes(query)
-            );
-            renderMaterialVault(filtered);
+            // Passthrough to sync global selectors concurrently
+            applyVaultInlineFilters();
         }
 
         function logoutUserProfile() {
