@@ -55,10 +55,10 @@ app.get('/', (req, res) => {
 // PERSISTENT PERMANENT AUTHENTICATION ROUTES
 // ==========================================
 
-// PERMANENT ROUTE 1: Sign Up Coordination Matrix (With Strict Security Checks)
+// PERMANENT ROUTE 1: Sign Up Coordination Matrix (With Program Mappings)
 app.post('/api/signup', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, program } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: "Missing identity validation metrics." });
         }
@@ -83,10 +83,11 @@ app.post('/api/signup', async (req, res) => {
             return res.status(400).json({ error: "Profile coordinates already initialized." });
         }
 
-        // Write the new profile data permanently to Firestore
+        // Write the new profile data permanently to Firestore including program tracking attributes
         await usersCollection.doc(normalizedEmail).set({
             email: normalizedEmail,
             password: password, 
+            program: program ? program.trim() : "General",
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
@@ -124,6 +125,49 @@ app.post('/api/login', async (req, res) => {
     } catch (err) {
         console.error("Firestore Login Error:", err);
         res.status(500).json({ error: "Security database comparison layer fault." });
+    }
+});
+
+// NEW PERMANENT ROUTE 3: Retrieve User Dashboard Profile Configuration
+app.post('/api/get-profile', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ error: "Missing tracking matrix parameters." });
+
+        const normalizedEmail = email.toLowerCase().trim();
+        const userDoc = await usersCollection.doc(normalizedEmail).get();
+        
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "Profile coordinates not found inside registry." });
+        }
+
+        const userData = userDoc.data();
+        res.json({ success: true, program: userData.program || "General" });
+    } catch (err) {
+        console.error("Firestore Profile Fetch Error:", err);
+        res.status(500).json({ error: "Failed to fetch configuration vectors." });
+    }
+});
+
+// NEW PERMANENT ROUTE 4: Modify & Synchronize User Academic Program Setting
+app.post('/api/update-profile', async (req, res) => {
+    try {
+        const { email, program } = req.body;
+        if (!email || !program) {
+            return res.status(400).json({ error: "Missing transmission identity metrics." });
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+        
+        // Atomically update user document profile parameters inside Firestore
+        await usersCollection.doc(normalizedEmail).update({
+            program: program.trim()
+        });
+
+        res.json({ success: true, message: "Profile configuration updated successfully!" });
+    } catch (err) {
+        console.error("Firestore Profile Update Error:", err);
+        res.status(500).json({ error: "Failed to update profile settings layer." });
     }
 });
 
