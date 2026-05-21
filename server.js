@@ -1,69 +1,113 @@
 require('dotenv').config();
 const express = require('express');
-const Groq = require('groq-sdk');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize the Groq client securely using environment variables
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY 
-});
+// ==========================================
+// FIREBASE ADMIN STORAGE INITIALIZATION
+// ==========================================
+const admin = require('firebase-admin');
+
+try {
+    // Gracefully handles loading the credentials from either Render environment or a local file
+    const serviceAccountData = process.env.FIREBASE_SERVICE_ACCOUNT 
+        ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+        : require('./firebase-key.json'); // Fallback path for local desktop testing
+
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccountData)
+    });
+    console.log("Firestore Database Layer Successfully Initialized!");
+} catch (error) {
+    console.error("Firestore Initialization Error:", error.message);
+}
+
+const db = admin.firestore();
+const usersCollection = db.collection('users');
 
 // Expanded JSON limit handles larger base64 file payloads smoothly
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static('public'));
 
-const localUsersTable = [];
 
-// LOCAL AUTH ROUTE 1: Sign Up Coordination Matrix
-app.post('/api/signup', (req, res) => {
+// ==========================================
+// PERSISTENT PERMANENT AUTHENTICATION ROUTES
+// ==========================================
+
+// PERMANENT ROUTE 1: Sign Up Coordination Matrix
+app.post('/api/signup', async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: "Missing identity validation metrics." });
         }
 
-        const userExists = localUsersTable.find(u => u.email.toLowerCase() === email.toLowerCase());
-        if (userExists) {
+        const normalizedEmail = email.toLowerCase().trim();
+
+        // Check if the user document already exists permanently in Firestore
+        const userDoc = await usersCollection.doc(normalizedEmail).get();
+        if (userDoc.exists) {
             return res.status(400).json({ error: "Profile coordinates already initialized." });
         }
 
-        localUsersTable.push({ 
-            email: email.toLowerCase(), 
-            password: password 
+        // Write the new profile data permanently to Firestore
+        await usersCollection.doc(normalizedEmail).set({
+            email: normalizedEmail,
+            password: password, // Note: In a production scale system, hashing passwords using bcrypt is recommended
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        res.json({ success: true, message: "Profile mapped completely!" });
+        res.json({ success: true, message: "Profile mapped completely to cloud database storage!" });
     } catch (err) {
-        res.status(500).json({ error: "Internal registry transaction crash." });
+        console.error("Firestore Signup Error:", err);
+        res.status(500).json({ error: "Internal registry database transaction crash." });
     }
 });
 
-// LOCAL AUTH ROUTE 2: Login Credentials Authentication Engine
-app.post('/api/login', (req, res) => {
+// PERMANENT ROUTE 2: Login Credentials Authentication Engine
+app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: "Parameters incomplete." });
         }
 
-        const user = localUsersTable.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-        if (!user) {
+        const normalizedEmail = email.toLowerCase().trim();
+
+        // Retrieve user credentials straight from your Firestore collection
+        const userDoc = await usersCollection.doc(normalizedEmail).get();
+        if (!userDoc.exists) {
             return res.status(401).json({ error: "Invalid operational access credentials." });
         }
 
-        res.json({ success: true, email: user.email });
+        const userData = userDoc.data();
+
+        // Perform credentials verification
+        if (userData.password !== password) {
+            return res.status(401).json({ error: "Invalid operational access credentials." });
+        }
+
+        res.json({ success: true, email: userData.email });
     } catch (err) {
-        res.status(500).json({ error: "Security layer comparison fault." });
+        console.error("Firestore Login Error:", err);
+        res.status(500).json({ error: "Security database comparison layer fault." });
     }
 });
+
+
+// ==========================================
+// CORE INTELLIGENT AI MODULE CORES
+// ==========================================
 
 // MODULE 1 ENDPOINT: Strategic Blueprint Generator (Powered by Groq LPU Speed)
 app.post('/check-academic', async (req, res) => {
     try {
         const { studentName, currentGpa, studentChallenge } = req.body;
+
+        const Groq = require('groq-sdk');
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
         const chatCompletion = await groq.chat.completions.create({
             messages: [
@@ -101,7 +145,6 @@ app.post('/ask-general', async (req, res) => {
     try {
         const { studentQuestion, studentName, fileData, fileType } = req.body;
 
-        // CRUCIAL WORKAROUND: Dynamically import the ESM library inside the runtime execution stack
         const { GoogleGenAI } = await import('@google/genai');
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -110,7 +153,6 @@ app.post('/ask-general', async (req, res) => {
 
         let contentsArray = [];
 
-        // Process standard text attachments or documents
         if (fileData && fileType && !fileType.startsWith('image/')) {
             if (fileType === 'application/pdf') {
                 textPrompt += `\n\n[System Notification: Student uploaded a reference document via PDF stream context].`;
@@ -121,7 +163,6 @@ app.post('/ask-general', async (req, res) => {
 
         contentsArray.push(textPrompt);
 
-        // If a camera picture snapshot is sent, parse it directly into Gemini's native inlineData configuration array
         if (fileData && fileType && fileType.startsWith('image/')) {
             const cleanBase64 = fileData.split(',')[1] || fileData;
             contentsArray.push({
@@ -132,7 +173,6 @@ app.post('/ask-general', async (req, res) => {
             });
         }
 
-        // Execute turning call on Gemini Flash Engine
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: contentsArray,
@@ -141,9 +181,7 @@ app.post('/ask-general', async (req, res) => {
             }
         });
 
-        res.json({
-            response: response.text
-        });
+        res.json({ response: response.text });
 
     } catch (error) {
         console.error("Gemini AI Engine Fault:", error);
