@@ -1,20 +1,23 @@
 require('dotenv').config();
 const express = require('express');
 const Groq = require('groq-sdk');
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY 
-});
+// Initialize clients securely using environment variables
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+// Expanded JSON limit handles larger base64 file payloads smoothly
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static('public'));
 
 const localUsersTable = [];
 
+// LOCAL AUTH ROUTE 1: Sign Up Coordination Matrix
 app.post('/api/signup', (req, res) => {
     try {
         const { email, password } = req.body;
@@ -32,6 +35,7 @@ app.post('/api/signup', (req, res) => {
     }
 });
 
+// LOCAL AUTH ROUTE 2: Login Credentials Authentication Engine
 app.post('/api/login', (req, res) => {
     try {
         const { email, password } = req.body;
@@ -48,6 +52,7 @@ app.post('/api/login', (req, res) => {
     }
 });
 
+// MODULE 1 ENDPOINT: Strategic Blueprint Generator (Powered by Groq LPU Speed)
 app.post('/check-academic', async (req, res) => {
     try {
         const { studentName, currentGpa, studentChallenge } = req.body;
@@ -73,46 +78,55 @@ app.post('/check-academic', async (req, res) => {
     }
 });
 
+// MODULE 2 ENDPOINT: General Assistant (Powered by Gemini 2.5 Multimodal Architecture)
 app.post('/ask-general', async (req, res) => {
     try {
         const { studentQuestion, studentName, fileData, fileType } = req.body;
+
+        let systemInstruction = `You are the official AI duplicate of Nicholas Opoku, academic advisor, tech specialist at UCC, and author of 'Life Mastery'. Answer tech, career, or programming questions. Keep it punchy, structure with bullet points, and end with a motivational punchline in Nicholas Opoku's signature voice.`;
         let textPrompt = `My name is ${studentName || "Scholar"}. Here is my question: "${studentQuestion || "See attached data layer."}"`;
 
+        // Array containing parts for the Gemini content model request
+        let contentsArray = [];
+
+        // Handle document text or PDF notation parameters
         if (fileData && fileType && !fileType.startsWith('image/')) {
-            textPrompt += fileType === 'application/pdf' ? `\n\n[Uploaded PDF package stream.]` : `\n\n[Attached File Context]:\n${fileData}`;
+            if (fileType === 'application/pdf') {
+                textPrompt += `\n\n[System Notification: Student uploaded a reference document via PDF stream context].`;
+            } else {
+                textPrompt += `\n\n[Attached File Context]:\n${fileData}`;
+            }
         }
 
-        let userContentArray = [{ type: "text", text: textPrompt }];
-        
-        if (fileData && fileType && fileType.startsWith('image/')) {
-            // FIX: Validates if data url headers are attached to prevent API blockages
-            let formattedImageUrl = fileData;
-            if (!formattedImageUrl.startsWith('data:')) {
-                formattedImageUrl = `data:${fileType};base64,${fileData}`;
-            }
+        // Push primary text prompt package
+        contentsArray.push(textPrompt);
 
-            userContentArray.push({ 
-                type: "image_url", 
-                image_url: { url: formattedImageUrl } 
+        // If an image asset is passed, transform it into Gemini SDK inlineData format objects smoothly
+        if (fileData && fileType && fileType.startsWith('image/')) {
+            // Strip any Data URL schema prefix to extract pure base64 byte text blocks if present
+            const cleanBase64 = fileData.split(',')[1] || fileData;
+            
+            contentsArray.push({
+                inlineData: {
+                    mimeType: fileType,
+                    data: cleanBase64
+                }
             });
         }
 
-        const chatCompletion = await groq.chat.completions.create({
-            messages: [
-                {
-                    role: "system",
-                    content: `You are the official AI duplicate of Nicholas Opoku, academic advisor, tech specialist at UCC, and author of 'Life Mastery'. Answer tech, career, or programming questions. Keep it punchy, structure with bullet points, and end with a motivational punchline.`
-                },
-                { role: "user", content: userContentArray }
-            ],
-            // STABLE PRODUCTION MODEL LINK
-            model: "llama-3.2-11b-vision-preview"
+        // Execute generation turn on Gemini Flash Engine
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: contentsArray,
+            config: {
+                systemInstruction: systemInstruction
+            }
         });
-        
-        res.json({ response: chatCompletion.choices[0].message.content });
+
+        res.json({ response: response.text });
     } catch (error) {
-        console.error("General Assistant Error:", error);
-        res.status(500).json({ response: `AI Processing Matrix Blocked: ${error.message || "Check engine configurations."}` });
+        console.error("Gemini AI Engine Fault:", error);
+        res.status(500).json({ response: `Gemini Processing Blocked: ${error.message || "Verify file structure or validation key handles."}` });
     }
 });
 
