@@ -10,10 +10,27 @@ const PORT = process.env.PORT || 3000;
 const admin = require('firebase-admin');
 
 try {
-    // Gracefully handles loading the credentials from either Render environment or a local file
-    const serviceAccountData = process.env.FIREBASE_SERVICE_ACCOUNT 
-        ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-        : require('./firebase-key.json'); // Fallback path for local desktop testing
+    let serviceAccountData;
+
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        const parsedCredentials = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        
+        // FIX: Re-maps key values and cleans text-escaped newline sequences
+        serviceAccountData = {
+            type: parsedCredentials.type,
+            projectId: parsedCredentials.project_id,
+            privateKeyId: parsedCredentials.private_key_id,
+            privateKey: parsedCredentials.private_key.replace(/\\n/g, '\n'),
+            clientEmail: parsedCredentials.client_email,
+            clientId: parsedCredentials.client_id,
+            authUri: parsedCredentials.auth_uri,
+            tokenUri: parsedCredentials.token_uri,
+            authProviderX509CertUrl: parsedCredentials.auth_provider_x509_cert_url,
+            clientX509CertUrl: parsedCredentials.client_x509_cert_url
+        };
+    } else {
+        serviceAccountData = require('./firebase-key.json'); // Local desktop backup fallback
+    }
 
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccountData)
@@ -55,7 +72,7 @@ app.post('/api/signup', async (req, res) => {
         // Write the new profile data permanently to Firestore
         await usersCollection.doc(normalizedEmail).set({
             email: normalizedEmail,
-            password: password, // Note: In a production scale system, hashing passwords using bcrypt is recommended
+            password: password, 
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
