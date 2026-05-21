@@ -110,30 +110,34 @@ app.post('/ask-general', async (req, res) => {
     try {
         const { studentQuestion, studentName, fileData, fileType } = req.body;
 
-        // Base structural text message container
-        let userContent = [
+        // Base structural text prompt string
+        let textPrompt = `My name is ${studentName || "Scholar"}. Here is my question: "${studentQuestion || "See attached data layer."}"`;
+
+        // Process document attachments by embedding text directly into the main prompt context
+        if (fileData && fileType && !fileType.startsWith('image/')) {
+            if (fileType === 'application/pdf') {
+                textPrompt += `\n\n[System Alert: User has uploaded a PDF document package via base64 stream].`;
+            } else {
+                textPrompt += `\n\n[Attached File Context]:\n${fileData}`;
+            }
+        }
+
+        // CRITICAL REFACTOR: Structuring the user content block to strictly comply with Groq Multimodal API syntax rules
+        let userContentArray = [
             {
                 type: "text",
-                text: `My name is ${studentName || "Scholar"}. Here is my question: "${studentQuestion || "See attached data layer."}"`
+                text: textPrompt
             }
         ];
 
-        if (fileData && fileType) {
-            if (fileType.startsWith('image/')) {
-                // Route image snapshots cleanly into Groq's multimodal image layer
-                userContent.push({
-                    type: "image_url",
-                    image_url: {
-                        url: fileData // Pass Base64 Data URL data stream
-                    }
-                });
-            } else if (fileType === 'application/pdf') {
-                // If it's a PDF base64 Data URL, we note its presence in context
-                userContent[0].text += `\n\n[System Alert: User has uploaded an academic/structural PDF document package via base64 stream].`;
-            } else {
-                // Plain text strings are appended directly as readable prompt context
-                userContent[0].text += `\n\n[Attached File Context]:\n${fileData}`;
-            }
+        // If it's a picture snapshot, add it as a separate block inside the content array
+        if (fileData && fileType && fileType.startsWith('image/')) {
+            userContentArray.push({
+                type: "image_url",
+                image_url: {
+                    url: fileData // Pass the raw Base64 Data URI string cleanly
+                }
+            });
         }
 
         const chatCompletion = await groq.chat.completions.create({
@@ -143,16 +147,15 @@ app.post('/ask-general', async (req, res) => {
                     content: `You are the official AI duplicate of Nicholas Opoku, elite academic advisor, tech specialist at UCC, and author of 'Life Mastery'. 
                     Your mission is to provide authoritative, inspiring, and sharp answers to any general academic, tech career, programming, or student growth questions.
                     
-                    You have advanced multimodal vision capabilities active. If an image file (camera snapshot, error screenshot, code breakdown) or a structural document file description is attached, look at the payload details closely to frame your support.
+                    You have advanced multimodal vision capabilities active. If an image file (camera snapshot, error screenshot, code breakdown) is attached, inspect the array metrics intensely to shape your feedback.
                     
                     Keep your answer punchy, actionable, and cleanly structured using bullet points. End with a sharp, motivational punchline in the style of Nicholas Opoku.`
                 },
                 {
                     role: "user",
-                    content: userContent
+                    content: userContentArray // Correctly formed multimodal layout row
                 }
             ],
-            // STABLE PRODUCTION MODEL FIX: Using the active vision-instruct architecture
             model: "llama-3.2-90b-vision-instruct"
         });
 
