@@ -9,6 +9,37 @@
 </head>
 <body class="bg-slate-950 text-white font-sans min-h-screen selection:bg-amber-500 selection:text-slate-950">
 
+    <div id="authOverlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl max-w-md w-full shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
+            
+            <div class="text-center space-y-2 mb-6">
+                <h3 id="authTitle" class="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-amber-400 bg-clip-text text-transparent">Access Life Mastery Engine</h3>
+                <p id="authSubtitle" class="text-xs text-slate-400">Log in to process blueprints and unlock the general knowledge base.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Email Parameters</label>
+                    <input type="email" id="authEmail" placeholder="yourname@domain.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Security Hash (Password)</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-800">
+                </div>
+
+                <button onclick="handleAuthAction()" id="authSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-3 rounded-lg text-sm tracking-wide transition mt-2 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10">
+                    <i class="fas fa-sign-in-alt"></i> Authenticate Operational Access
+                </button>
+
+                <p class="text-center text-xs text-slate-500 pt-2">
+                    <span id="authSwitchText">New scholar to the ecosystem?</span>
+                    <button onclick="toggleAuthMode()" id="authSwitchBtn" class="text-amber-400 font-semibold underline ml-1 hover:text-amber-300">Create Account</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
     <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-6 py-4">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 self-start sm:self-auto">
@@ -20,12 +51,15 @@
                     <span class="text-[10px] sm:text-[11px] text-amber-500/80 italic tracking-wide mt-1 font-medium">Rise With A Purpose</span>
                 </div>
             </div>
-            <div class="flex items-center gap-4 sm:gap-6 text-sm font-medium text-slate-400 w-full sm:w-auto justify-center sm:justify-end">
+            <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm font-medium text-slate-400 w-full sm:w-auto justify-center sm:justify-end">
                 <a href="https://nicholasopoku.online" target="_blank" class="hover:text-amber-400 transition">About</a>
                 <a href="#hub" class="hover:text-amber-400 transition">Nicholas | Academic Advisor</a>
                 <a href="https://whatsapp.com/channel/0029Vb6AG9X1NCrMjskryF2y" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-full flex items-center gap-2 transition shadow-lg shadow-emerald-600/10 text-xs sm:text-sm">
-                    <i class="fab fa-whatsapp text-base sm:text-lg"></i> Join My Channel
+                    <i class="fab fa-whatsapp text-base sm:text-lg"></i> Join Channel
                 </a>
+                <button onclick="logoutUserProfile()" class="hover:text-red-400 transition text-xs border border-slate-800 bg-slate-950 px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-semibold">
+                    <i class="fas fa-power-off text-red-500"></i> Sign Out
+                </button>
             </div>
         </div>
     </nav>
@@ -68,99 +102,115 @@
 
     <hr class="border-slate-900 max-w-6xl mx-auto my-2 px-4">
 
-    <main id="hub" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-12">
+    <main id="hub" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-16">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
-            <div class="lg:col-span-5 bg-slate-900/60 border border-slate-800/80 p-5 sm:p-8 rounded-2xl shadow-xl h-fit">
-                <h3 class="text-lg sm:text-xl font-bold text-amber-400 mb-1">Nicholas Opoku Consult Portal</h3>
-                <p class="text-xs text-slate-400 mb-6">Receive your tailored strategic execution parameters.</p>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Student Identity</label>
-                        <input type="text" id="studentName" placeholder="Enter full name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-700">
+        <div class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+                <div class="lg:col-span-5 bg-slate-900/60 border border-slate-800/80 p-5 sm:p-8 rounded-2xl shadow-xl h-fit">
+                    <h3 class="text-lg sm:text-xl font-bold text-amber-400 mb-1">Nicholas Opoku Consult Portal</h3>
+                    <p class="text-xs text-slate-400 mb-6">Receive your tailored strategic execution parameters.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Student Identity</label>
+                            <input type="text" id="studentName" placeholder="Enter full name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-700">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Current Academic Metric (GPA)</label>
+                            <input type="number" step="0.1" id="currentGpa" placeholder="e.g. 3.4" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-700">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Primary Setback / Problem / Challenge</label>
+                            <textarea id="studentChallenge" rows="4" placeholder="e.g., Balancing coding practicals with hall publicity duties..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition resize-none placeholder:text-slate-700"></textarea>
+                        </div>
+
+                        <button onclick="checkAcademicStatus()" id="blueprintBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-3 rounded-lg text-sm tracking-wide transition mt-4 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10">
+                            <i class="fas fa-brain"></i> Generate Success Blueprint
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 flex flex-col justify-start">
+                    <div id="placeholderBox" class="border border-dashed border-slate-800 rounded-2xl p-8 sm:p-12 text-center my-auto flex flex-col items-center justify-center text-slate-500 min-h-[200px]">
+                        <i class="fas fa-terminal text-3xl sm:text-4xl mb-4 text-slate-700"></i>
+                        <p class="text-xs sm:text-sm max-w-sm">Input data and click generate to process the custom blueprint response payload.</p>
                     </div>
 
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Current Academic Metric (GPA)</label>
-                        <input type="number" step="0.1" id="currentGpa" placeholder="e.g. 3.4" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition placeholder:text-slate-700">
+                    <div id="resultBox" class="hidden bg-slate-900 border border-amber-500/20 p-5 sm:p-8 rounded-2xl shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-4 mb-6 gap-2">
+                            <h3 id="responseTitle" class="font-bold text-amber-400 text-base sm:text-lg tracking-tight"></h3>
+                            <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-400 px-2 py-1 rounded whitespace-nowrap">Execution Layer Active</span>
+                        </div>
+                        <p id="responseAdvice" class="text-slate-300 text-xs sm:text-sm leading-relaxed whitespace-pre-line"></p>
                     </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Primary Setback / Problem / Challenge</label>
-                        <textarea id="studentChallenge" rows="4" placeholder="e.g., Balancing coding practicals with hall publicity duties, social media doomscrolling..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition resize-none placeholder:text-slate-700"></textarea>
-                    </div>
-
-                    <button onclick="checkAcademicStatus()" id="blueprintBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-3 rounded-lg text-sm tracking-wide transition mt-4 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10">
-                        <i class="fas fa-brain"></i> Generate Success Blueprint
-                    </button>
                 </div>
             </div>
-
-            <div class="lg:col-span-7 flex flex-col justify-start">
-                <div id="placeholderBox" class="border border-dashed border-slate-800 rounded-2xl p-8 sm:p-12 text-center my-auto flex flex-col items-center justify-center text-slate-500 min-h-[200px]">
-                    <i class="fas fa-terminal text-3xl sm:text-4xl mb-4 text-slate-700"></i>
-                    <p class="text-xs sm:text-sm max-w-sm">Input data and click generate to process the custom blueprint response payload.</p>
-                </div>
-
-                <div id="resultBox" class="hidden bg-slate-900 border border-amber-500/20 p-5 sm:p-8 rounded-2xl shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-4 mb-6 gap-2">
-                        <h3 id="responseTitle" class="font-bold text-amber-400 text-base sm:text-lg tracking-tight"></h3>
-                        <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-400 px-2 py-1 rounded whitespace-nowrap">Execution Layer Active</span>
+            
+            <div class="bg-slate-900/20 border border-slate-900 rounded-2xl p-4 sm:p-6">
+                <h4 class="text-xs font-bold tracking-widest text-amber-400 uppercase mb-4"><i class="fas fa-history mr-2"></i>Your Blueprint Archive</h4>
+                <div id="blueprintHistoryContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2">
                     </div>
-                    <p id="responseAdvice" class="text-slate-300 text-xs sm:text-sm leading-relaxed whitespace-pre-line"></p>
-                </div>
             </div>
         </div>
 
-        <div class="border-t border-slate-900 pt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
-            <div class="lg:col-span-5 bg-slate-900/40 border border-slate-800/60 p-5 sm:p-8 rounded-2xl shadow-xl h-fit">
-                <h3 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-1">General Knowledge Base</h3>
-                <p class="text-xs text-slate-400 mb-6">Ask Nicholas AI anything, upload files, or snap pictures of code glitches or charts.</p>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">What May I Assist You With</label>
-                        <textarea id="generalQuestion" rows="4" placeholder="e.g., Look at this screen error snippet. Why is my server failing? Or ask general tech advice..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition resize-none placeholder:text-slate-700"></textarea>
-                    </div>
+        <div class="border-t border-slate-900 pt-12 space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+                <div class="lg:col-span-5 bg-slate-900/40 border border-slate-800/60 p-5 sm:p-8 rounded-2xl shadow-xl h-fit">
+                    <h3 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-1">General Knowledge Base</h3>
+                    <p class="text-xs text-slate-400 mb-6">Ask Nicholas AI anything, upload files, or snap pictures of code glitches or charts.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">What May I Assist You With</label>
+                            <textarea id="generalQuestion" rows="4" placeholder="e.g., Look at this screen error snippet. Why is my server failing? Or ask general tech advice..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400 transition resize-none placeholder:text-slate-700"></textarea>
+                        </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
-                        <label for="pictureAttachment" class="flex-1 min-w-[120px] cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-2.5 rounded-lg text-xs font-semibold text-center transition flex items-center justify-center gap-2 shadow-inner">
-                            <i class="fas fa-camera"></i> <span id="picStatus">Snap Picture</span>
-                        </label>
-                        <input type="file" id="pictureAttachment" accept="image/*" capture="environment" class="hidden" onchange="processMediaFile('pictureAttachment')">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label for="pictureAttachment" class="flex-1 min-w-[120px] cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-2.5 rounded-lg text-xs font-semibold text-center transition flex items-center justify-center gap-2 shadow-inner">
+                                <i class="fas fa-camera"></i> <span id="picStatus">Snap Picture</span>
+                            </label>
+                            <input type="file" id="pictureAttachment" accept="image/*" capture="environment" class="hidden" onchange="processMediaFile('pictureAttachment')">
 
-                        <label for="docAttachment" class="flex-1 min-w-[120px] cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-2.5 rounded-lg text-xs font-semibold text-center transition flex items-center justify-center gap-2 shadow-inner">
-                            <i class="fas fa-file-alt"></i> <span id="docStatus">Upload File</span>
-                        </label>
-                        <input type="file" id="docAttachment" accept="application/pdf,text/plain" class="hidden" onchange="processMediaFile('docAttachment')">
-                        
-                        <button id="clearFileBtn" onclick="clearSelectedFile()" class="hidden bg-red-950/40 hover:bg-red-900/60 border border-red-900/60 text-red-400 px-3 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
-                            <i class="fas fa-trash-alt"></i> Clear
+                            <label for="docAttachment" class="flex-1 min-w-[120px] cursor-pointer bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-amber-500 text-slate-400 hover:text-amber-400 px-3 py-2.5 rounded-lg text-xs font-semibold text-center transition flex items-center justify-center gap-2 shadow-inner">
+                                <i class="fas fa-file-alt"></i> <span id="docStatus">Upload File</span>
+                            </label>
+                            <input type="file" id="docAttachment" accept="application/pdf,text/plain" class="hidden" onchange="processMediaFile('docAttachment')">
+                            
+                            <button id="clearFileBtn" onclick="clearSelectedFile()" class="hidden bg-red-950/40 hover:bg-red-900/60 border border-red-900/60 text-red-400 px-3 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
+                                <i class="fas fa-trash-alt"></i> Clear
+                            </button>
+                        </div>
+
+                        <button onclick="askGeneralQuestion()" id="generalBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold p-3 rounded-lg text-sm tracking-wide transition flex items-center justify-center gap-2 shadow-lg">
+                            <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </div>
+                </div>
 
-                    <button onclick="askGeneralQuestion()" id="generalBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold p-3 rounded-lg text-sm tracking-wide transition flex items-center justify-center gap-2 shadow-lg">
-                        <i class="fas fa-paper-plane"></i> Send
-                    </button>
+                <div class="lg:col-span-7 flex flex-col justify-start">
+                    <div id="generalPlaceholder" class="border border-dashed border-slate-800 rounded-2xl p-8 sm:p-12 text-center my-auto flex flex-col items-center justify-center text-slate-500 min-h-[180px]">
+                        <i class="fas fa-comments text-3xl sm:text-4xl mb-4 text-slate-700"></i>
+                        <p class="text-xs sm:text-sm max-w-sm">Awaiting inquiries. Submit any technical, structural, or creative problem statement above.</p>
+                    </div>
+
+                    <div id="generalResultBox" class="hidden bg-slate-900 border border-slate-800 p-5 sm:p-8 rounded-2xl shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-6">
+                            <h3 class="font-bold text-slate-200 text-base sm:text-lg tracking-tight"><i class="fas fa-robot text-amber-400 mr-2"></i>AI Knowledge Stream:</h3>
+                            <span class="text-[9px] font-mono uppercase bg-slate-800 text-slate-400 px-2 py-1 rounded">Query Solved</span>
+                        </div>
+                        <p id="generalResponseText" class="text-slate-300 text-xs sm:text-sm leading-relaxed whitespace-pre-line"></p>
+                    </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-7 flex flex-col justify-start">
-                <div id="generalPlaceholder" class="border border-dashed border-slate-800 rounded-2xl p-8 sm:p-12 text-center my-auto flex flex-col items-center justify-center text-slate-500 min-h-[180px]">
-                    <i class="fas fa-comments text-3xl sm:text-4xl mb-4 text-slate-700"></i>
-                    <p class="text-xs sm:text-sm max-w-sm">Awaiting inquiries. Submit any technical, structural, or creative problem statement above.</p>
-                </div>
-
-                <div id="generalResultBox" class="hidden bg-slate-900 border border-slate-800 p-5 sm:p-8 rounded-2xl shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
-                    <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-6">
-                        <h3 class="font-bold text-slate-200 text-base sm:text-lg tracking-tight"><i class="fas fa-robot text-amber-400 mr-2"></i>AI Knowledge Stream:</h3>
-                        <span class="text-[9px] font-mono uppercase bg-slate-800 text-slate-400 px-2 py-1 rounded">Query Solved</span>
+            <div class="bg-slate-900/20 border border-slate-900 rounded-2xl p-4 sm:p-6">
+                <h4 class="text-xs font-bold tracking-widest text-orange-400 uppercase mb-4"><i class="fas fa-comments-dollar mr-2"></i>Your Knowledge Base Thread Logs</h4>
+                <div id="generalChatHistoryContainer" class="space-y-4 max-h-[350px] overflow-y-auto pr-2">
                     </div>
-                    <p id="generalResponseText" class="text-slate-300 text-xs sm:text-sm leading-relaxed whitespace-pre-line"></p>
-                </div>
             </div>
         </div>
 
@@ -171,10 +221,156 @@
     </footer>
 
     <script>
-        // Global asset tracking references
+        let isSignUpMode = false;
         let attachedFileData = null;
         let attachedFileType = null;
+        let currentUserEmail = null; // Holds active scope pointer
 
+        // LOCAL AUTH ACTIONS LAYER
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const btn = document.getElementById('authSubmitBtn');
+            const switchText = document.getElementById('authSwitchText');
+            const switchBtn = document.getElementById('authSwitchBtn');
+
+            if (isSignUpMode) {
+                title.innerText = "Initialize Success Profile";
+                subtitle.innerText = "Register your identity data vector within the system.";
+                btn.innerHTML = `<i class="fas fa-user-plus"></i> Register Profile Coordinates`;
+                switchText.innerText = "Already registered within the hub?";
+                switchBtn.innerText = "Sign In";
+            } else {
+                title.innerText = "Access Life Mastery Engine";
+                subtitle.innerText = "Log in to process blueprints and unlock the general knowledge base.";
+                btn.innerHTML = `<i class="fas fa-sign-in-alt"></i> Authenticate Operational Access`;
+                switchText.innerText = "New scholar to the ecosystem?";
+                switchBtn.innerText = "Create Account";
+            }
+        }
+
+        async function handleAuthAction() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const btn = document.getElementById('authSubmitBtn');
+
+            if (!email || !password) {
+                alert("Provide complete registration fields.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Processing Security Matrix...`;
+
+            const targetUrl = isSignUpMode ? '/api/signup' : '/api/login';
+
+            try {
+                const res = await fetch(targetUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "System security block.");
+
+                if (isSignUpMode) {
+                    alert("Profile configured successfully! Switching to sign-in lane.");
+                    toggleAuthMode();
+                } else {
+                    localStorage.setItem('userSessionToken', data.email);
+                    checkUserSessionState();
+                }
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = isSignUpMode ? `<i class="fas fa-user-plus"></i> Register` : `<i class="fas fa-sign-in-alt"></i> Authenticate`;
+            }
+        }
+
+        function logoutUserProfile() {
+            localStorage.removeItem('userSessionToken');
+            currentUserEmail = null;
+            checkUserSessionState();
+            alert("Session coordinates dropped safely.");
+        }
+
+        function checkUserSessionState() {
+            const token = localStorage.getItem('userSessionToken');
+            const overlay = document.getElementById('authOverlay');
+            if (token) {
+                currentUserEmail = token;
+                overlay.classList.add('hidden');
+                renderUserSavedHistories(); // Populate history logs on valid entrance
+            } else {
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        // HISTORY MANAGEMENT ENGINE (USER SPACE ENCRYPTED)
+        function fetchUserHistoryKey(type) {
+            return `history_${currentUserEmail}_${type}`;
+        }
+
+        function saveHistoryItem(type, item) {
+            const storageKey = fetchUserHistoryKey(type);
+            let activeHistory = JSON.parse(localStorage.getItem(storageKey)) || [];
+            activeHistory.unshift(item); // Prepend so latest shows at the top
+            localStorage.setItem(storageKey, JSON.stringify(activeHistory));
+            renderUserSavedHistories();
+        }
+
+        function renderUserSavedHistories() {
+            if (!currentUserEmail) return;
+
+            // Render Blueprints Archive
+            const blueprintContainer = document.getElementById('blueprintHistoryContainer');
+            const blueprintKey = fetchUserHistoryKey('blueprints');
+            const blueprints = JSON.parse(localStorage.getItem(blueprintKey)) || [];
+
+            if (blueprints.length === 0) {
+                blueprintContainer.innerHTML = `<div class="col-span-full text-slate-600 text-xs italic">No blueprints processed yet.</div>`;
+            } else {
+                blueprintContainer.innerHTML = blueprints.map(b => `
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500/40"></div>
+                        <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono">
+                            <span>GPA: ${b.gpa}</span>
+                            <span>${b.timestamp}</span>
+                        </div>
+                        <h5 class="text-xs font-bold text-slate-200 line-clamp-1">${b.title}</h5>
+                        <p class="text-[11px] text-slate-400 line-clamp-3 whitespace-pre-line">${b.advice}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Render General Conversations Thread Logs
+            const chatContainer = document.getElementById('generalChatHistoryContainer');
+            const chatKey = fetchUserHistoryKey('chats');
+            const chats = JSON.parse(localStorage.getItem(chatKey)) || [];
+
+            if (chats.length === 0) {
+                chatContainer.innerHTML = `<div class="text-slate-600 text-xs italic">No inquiry threads logged yet.</div>`;
+            } else {
+                chatContainer.innerHTML = chats.map(c => `
+                    <div class="bg-slate-900/40 border border-slate-800 p-4 rounded-xl space-y-3">
+                        <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono border-b border-slate-800/60 pb-1">
+                            <span><i class="fas fa-user text-slate-600 mr-1"></i>Query String</span>
+                            <span>${c.timestamp}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 font-medium italic">"${c.question}"</p>
+                        <div class="bg-slate-950/60 border border-slate-900 p-3 rounded-lg text-[11px] text-slate-400 whitespace-pre-line">
+                            <strong class="text-amber-400 text-[10px] uppercase font-mono block mb-1">AI Response:</strong>
+                            ${c.response}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // BINARY MULTIMEDIA FILE PARSING LOGIC
         function processMediaFile(inputId) {
             const fileInput = document.getElementById(inputId);
             const picStatus = document.getElementById('picStatus');
@@ -184,22 +380,19 @@
 
             if (!file) return;
 
-            // Constrain files to 4MB for high-speed network delivery
             if (file.size > 4 * 1024 * 1024) {
-                alert("File architecture threshold exceeded. Max size limit is 4MB.");
+                alert("Max size limit is 4MB.");
                 clearSelectedFile();
                 return;
             }
 
-            // Always clear previous choices so only one file transits at a time
             clearSelectedFile(false); 
-
             attachedFileType = file.type;
             const reader = new FileReader();
 
             reader.onloadend = function () {
                 attachedFileData = reader.result; 
-                const shortName = `File: ${file.name.substring(0, 8)}...`;
+                const shortName = `Attached: ${file.name.substring(0, 8)}...`;
                 
                 if (inputId === 'pictureAttachment') {
                     picStatus.innerText = shortName;
@@ -211,42 +404,49 @@
                 clearBtn.classList.remove('hidden');
             }
 
-            if (file.type.startsWith('image/')) {
-                reader.readAsDataURL(file); // Encode image as Base64 Data URI string
+            if (file.type === 'text/plain') {
+                reader.readAsText(file); 
             } else {
-                reader.readAsText(file); // Parse plain text or code strings as simple context strings
+                reader.readAsDataURL(file); 
             }
         }
 
-        // Clean Reset Utility for all selection lanes
         function clearSelectedFile(hideTrashButton = true) {
             attachedFileData = null;
             attachedFileType = null;
-            document.getElementById('pictureAttachment').value = "";
-            document.getElementById('docAttachment').value = "";
+            
+            const picInput = document.getElementById('pictureAttachment');
+            const docInput = document.getElementById('docAttachment');
+            if (picInput) picInput.value = "";
+            if (docInput) docInput.value = "";
             
             const picStatus = document.getElementById('picStatus');
             const docStatus = document.getElementById('docStatus');
             
-            picStatus.innerText = "Snap Picture";
-            picStatus.parentElement.classList.remove('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
-            
-            docStatus.innerText = "Upload File";
-            docStatus.parentElement.classList.remove('text-amber-400', 'border-amber-500', 'bg-amber-500/5');
-            
+            if (picStatus) {
+                picStatus.innerText = "Snap Picture";
+                picStatus.parentElement.className = picStatus.parentElement.className
+                    .replace(/text-amber-400|border-amber-500|bg-amber-500\/5/g, '').replace(/\s+/g, ' ').trim();
+            }
+            if (docStatus) {
+                docStatus.innerText = "Upload File";
+                docStatus.parentElement.className = docStatus.parentElement.className
+                    .replace(/text-amber-400|border-amber-500|bg-amber-500\/5/g, '').replace(/\s+/g, ' ').trim();
+            }
             if (hideTrashButton) {
-                document.getElementById('clearFileBtn').classList.add('hidden');
+                const clearBtn = document.getElementById('clearFileBtn');
+                if (clearBtn) clearBtn.classList.add('hidden');
             }
         }
 
-        // Blueprint Core Logic
+        // TRANSACTION PAYLOAD ROUTING
         async function checkAcademicStatus() {
             const name = document.getElementById('studentName').value;
             const gpa = document.getElementById('currentGpa').value;
             const challenge = document.getElementById('studentChallenge').value;
 
             if (!name || !gpa || !challenge) {
-                alert("Please fill out all operational validation parameters before engine deployment.");
+                alert("Please fill out all validation fields.");
                 return;
             }
 
@@ -261,36 +461,40 @@
                 const response = await fetch('/check-academic', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        studentName: name, 
-                        currentGpa: parseFloat(gpa),
-                        studentChallenge: challenge 
-                    })
+                    body: JSON.stringify({ studentName: name, currentGpa: parseFloat(gpa), studentChallenge: challenge })
                 });
 
                 const data = await response.json();
-
+                
                 document.getElementById('responseTitle').innerText = data.message;
                 document.getElementById('responseAdvice').innerText = data.advice;
                 
                 placeholder.classList.add('hidden');
                 result.classList.remove('hidden');
                 result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                // Archive the generated result to localStorage history maps
+                saveHistoryItem('blueprints', {
+                    title: data.message,
+                    advice: data.advice,
+                    gpa: gpa,
+                    timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                });
+
             } catch (err) {
-                alert("Communication crash with cloud engine. Verify backend logs.");
+                alert("Communication crash with cloud engine.");
             } finally {
                 btn.innerHTML = `<i class="fas fa-brain"></i> Generate Success Blueprint`;
                 btn.disabled = false;
             }
         }
 
-        // General Multi-Modal AI Assistant Logic
         async function askGeneralQuestion() {
             const question = document.getElementById('generalQuestion').value;
             const fallbackName = document.getElementById('studentName').value || "Scholar";
 
             if (!question && !attachedFileData) {
-                alert("Please provide either a structural text query or an image attachment parameter.");
+                alert("Please type a question or select a target media file.");
                 return;
             }
 
@@ -298,33 +502,32 @@
             const placeholder = document.getElementById('generalPlaceholder');
             const result = document.getElementById('generalResultBox');
             
-            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Processing Multimodal Payload...`;
+            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Processing...`;
             btn.disabled = true;
 
             try {
                 const response = await fetch('/ask-general', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        studentQuestion: question,
-                        studentName: fallbackName,
-                        fileData: attachedFileData,
-                        fileType: attachedFileType
-                    })
+                    body: JSON.stringify({ studentQuestion: question, studentName: fallbackName, fileData: attachedFileData, fileType: attachedFileType })
                 });
 
                 const data = await response.json();
-
                 document.getElementById('generalResponseText').innerText = data.response;
                 
                 placeholder.classList.add('hidden');
                 result.classList.remove('hidden');
                 result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-                // Reset inputs and system parameters after payload resolution
+                // Archive conversation variables to history maps
+                saveHistoryItem('chats', {
+                    question: question || "Sent file layout parameter snap.",
+                    response: data.response,
+                    timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                });
+
                 document.getElementById('generalQuestion').value = "";
                 clearSelectedFile();
-
             } catch (err) {
                 alert("Communication crash with general knowledge engine.");
             } finally {
@@ -332,6 +535,8 @@
                 btn.disabled = false;
             }
         }
+
+        window.onload = checkUserSessionState;
     </script>
 </body>
 </html>

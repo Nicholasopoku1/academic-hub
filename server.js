@@ -15,6 +15,53 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static('public'));
 
+// LOCAL IN-MEMORY DATA ENGINE (Perfect for completely free independent hosting)
+const localUsersTable = [];
+
+// LOCAL AUTH ROUTE 1: Sign Up Coordination Matrix
+app.post('/api/signup', (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: "Missing identity validation metrics." });
+        }
+
+        const userExists = localUsersTable.find(u => u.email.toLowerCase() === email.toLowerCase());
+        if (userExists) {
+            return res.status(400).json({ error: "Profile coordinates already initialized." });
+        }
+
+        // Map and preserve credentials directly inside local execution vectors
+        localUsersTable.push({ 
+            email: email.toLowerCase(), 
+            password: password 
+        });
+
+        res.json({ success: true, message: "Profile mapped completely!" });
+    } catch (err) {
+        res.status(500).json({ error: "Internal registry transaction crash." });
+    }
+});
+
+// LOCAL AUTH ROUTE 2: Login Credentials Authentication Engine
+app.post('/api/login', (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: "Parameters incomplete." });
+        }
+
+        const user = localUsersTable.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+        if (!user) {
+            return res.status(401).json({ error: "Invalid operational access credentials." });
+        }
+
+        res.json({ success: true, email: user.email });
+    } catch (err) {
+        res.status(500).json({ error: "Security layer comparison fault." });
+    }
+});
+
 // MODULE 1 ENDPOINT: Strategic Blueprint Generator
 app.post('/check-academic', async (req, res) => {
     try {
